@@ -291,8 +291,6 @@ function openProblemScreen() {
   document.getElementById("results").innerHTML = "";
   document.getElementById("results").style.display = "none";
 
-  // 탭 초기화
-  switchTab("problem-tab");
 }
 
 function formatTimer(s) {
@@ -306,20 +304,10 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// 탭 전환
-function switchTab(tabName) {
-  document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
-
-  document.querySelector(`[data-tab="${tabName}"]`).classList.add("active");
-  document.getElementById(tabName).classList.add("active");
-}
-
 // 힌트
 function revealHint() {
   state.showHint = true;
   renderHint();
-  switchTab("problem-tab");
 }
 
 function nextHint() {
@@ -386,7 +374,6 @@ function submitCode() {
     setTimeout(() => showSolvedScreen(), 800);
   }
 
-  switchTab("code-tab");
 }
 
 function runCode(code, input, expectedOutput, index) {
@@ -458,8 +445,9 @@ function dismissAlarm() {
   showScreen("main");
 }
 
-// ===================== 코드 에디터 탭 키 지원 =====================
+// ===================== 초기화 =====================
 document.addEventListener("DOMContentLoaded", () => {
+  // 코드 에디터 탭 키 지원
   const editor = document.getElementById("code-editor");
   if (editor) {
     editor.addEventListener("keydown", (e) => {
@@ -471,6 +459,35 @@ document.addEventListener("DOMContentLoaded", () => {
         editor.selectionStart = editor.selectionEnd = start + 2;
       }
     });
+  }
+
+  // 스플릿 뷰 드래그 디바이더
+  const divider = document.getElementById("split-divider");
+  if (divider) {
+    let dragging = false;
+    const splitView = divider.parentElement;
+    const leftPanel = divider.previousElementSibling;
+
+    const onMove = (clientX, clientY) => {
+      if (!dragging) return;
+      const isMobile = window.innerWidth <= 768;
+      const rect = splitView.getBoundingClientRect();
+
+      if (isMobile) {
+        const pct = ((clientY - rect.top) / rect.height) * 100;
+        leftPanel.style.height = Math.max(20, Math.min(80, pct)) + "%";
+      } else {
+        const pct = ((clientX - rect.left) / rect.width) * 100;
+        leftPanel.style.width = Math.max(20, Math.min(80, pct)) + "%";
+      }
+    };
+
+    divider.addEventListener("mousedown", () => { dragging = true; divider.classList.add("dragging"); });
+    divider.addEventListener("touchstart", () => { dragging = true; divider.classList.add("dragging"); });
+    window.addEventListener("mousemove", (e) => onMove(e.clientX, e.clientY));
+    window.addEventListener("touchmove", (e) => onMove(e.touches[0].clientX, e.touches[0].clientY));
+    window.addEventListener("mouseup", () => { dragging = false; divider.classList.remove("dragging"); });
+    window.addEventListener("touchend", () => { dragging = false; divider.classList.remove("dragging"); });
   }
 
   renderAlarmList();

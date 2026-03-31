@@ -64,7 +64,7 @@
     <button class="btn-save" onclick="saveAlarm()">저장</button>
   </div>
 
-  <!-- ==================== 문제 풀기 화면 ==================== -->
+  <!-- ==================== 문제 풀기 화면 (Split View) ==================== -->
   <div id="screen-problem" class="screen">
     <!-- 상단 바 -->
     <div class="problem-header">
@@ -72,32 +72,34 @@
       <span class="timer" id="timer">00:00</span>
     </div>
 
-    <!-- 탭 -->
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="problem-tab" onclick="switchTab('problem-tab')">&#128196; 문제</button>
-      <button class="tab-btn" data-tab="code-tab" onclick="switchTab('code-tab')">&#128187; 코드</button>
-    </div>
-
-    <!-- 문제 탭 -->
-    <div id="problem-tab" class="tab-content active" style="overflow-y:auto;flex:1">
-      <h2 class="problem-title" id="problem-title"></h2>
-      <div class="problem-desc" id="problem-desc"></div>
-      <div id="examples"></div>
-      <div id="hint-area" style="display:none"></div>
-    </div>
-
-    <!-- 코드 탭 -->
-    <div id="code-tab" class="tab-content" style="flex:1">
-      <div class="code-editor" style="flex:1;display:flex;flex-direction:column">
-        <textarea class="code-textarea" id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-        <div class="results" id="results" style="display:none"></div>
+    <!-- 스플릿 뷰 -->
+    <div class="split-view">
+      <!-- 왼쪽: 문제 설명 -->
+      <div class="split-left">
+        <div class="panel-title">&#128196; 문제</div>
+        <div class="panel-body">
+          <h2 class="problem-title" id="problem-title"></h2>
+          <div class="problem-desc" id="problem-desc"></div>
+          <div id="examples"></div>
+          <div id="hint-area" style="display:none"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- 하단 바 -->
-    <div class="bottom-bar">
-      <button class="btn-hint" onclick="revealHint()">&#128161; 힌트</button>
-      <button class="btn-submit" onclick="submitCode()">&#9654; 제출</button>
+      <!-- 드래그 핸들 -->
+      <div class="split-divider" id="split-divider"></div>
+
+      <!-- 오른쪽: 코드 에디터 -->
+      <div class="split-right">
+        <div class="panel-title">&#128187; 코드</div>
+        <div class="code-editor">
+          <textarea class="code-textarea" id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          <div class="results" id="results" style="display:none"></div>
+        </div>
+        <div class="bottom-bar">
+          <button class="btn-hint" onclick="revealHint()">&#128161; 힌트</button>
+          <button class="btn-submit" onclick="submitCode()">&#9654; 제출</button>
+        </div>
+      </div>
     </div>
   </div>
 

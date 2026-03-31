@@ -303,14 +303,19 @@ body {
   opacity: 0.9;
 }
 
-/* ===================== 문제 풀기 화면 ===================== */
-.problem-header {
+/* ===================== 문제 풀기 화면 (Split View) ===================== */
+#screen-problem {
+  max-width: 100%;
+  padding: 0;
+  height: 100vh;
+}
+#screen-problem .problem-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--surface2);
-  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 .timer {
   font-family: "SF Mono", "Fira Code", monospace;
@@ -318,36 +323,54 @@ body {
   color: var(--text2);
 }
 
-.tab-bar {
+/* 스플릿 뷰 */
+.split-view {
   display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-.tab-btn {
   flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text3);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.tab-btn.active {
-  background: rgba(108, 92, 231, 0.15);
-  color: var(--accent-light);
+  overflow: hidden;
 }
 
-.tab-content {
-  display: none;
-  flex: 1;
-  overflow-y: auto;
-}
-.tab-content.active {
+.split-left {
+  width: 50%;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid var(--surface2);
+}
+.split-right {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text3);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--surface2);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* 드래그 디바이더 */
+.split-divider {
+  width: 5px;
+  cursor: col-resize;
+  background: var(--surface2);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.split-divider:hover,
+.split-divider.dragging {
+  background: var(--accent);
 }
 
 /* 문제 설명 */
@@ -411,6 +434,47 @@ body {
   cursor: pointer;
   margin-top: 8px;
   padding: 0;
+}
+
+/* 오른쪽 패널 코드 에디터 */
+.split-right .code-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
+}
+.split-right .code-textarea {
+  flex: 1;
+  min-height: 0;
+}
+.split-right .bottom-bar {
+  padding: 12px;
+  margin-top: 0;
+  border-top: 1px solid var(--surface2);
+  flex-shrink: 0;
+}
+
+/* 모바일: 세로 스플릿 */
+@media (max-width: 768px) {
+  .split-view {
+    flex-direction: column;
+  }
+  .split-left {
+    width: 100%;
+    height: 45%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--surface2);
+  }
+  .split-right {
+    min-width: unset;
+  }
+  .split-divider {
+    width: 100%;
+    height: 5px;
+    cursor: row-resize;
+  }
 }
 
 /* 코드 에디터 */
