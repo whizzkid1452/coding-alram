@@ -418,7 +418,6 @@ function runCode(code, input, expectedOutput, index) {
   try {
     const wrapped = new Function(
       "input",
-      "console",
       `
       const __output = [];
       const console = { log: function() {
@@ -432,7 +431,7 @@ function runCode(code, input, expectedOutput, index) {
     `
     );
 
-    const result = wrapped(input.trim(), {});
+    const result = wrapped(input.trim());
     const actual = (result || "").trim();
     const expected = expectedOutput.trim();
 
