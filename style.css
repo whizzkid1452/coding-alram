@@ -436,6 +436,71 @@ body {
   padding: 0;
 }
 
+/* 정답 보기 버튼 */
+.btn-show-answer {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border: 2px solid var(--green);
+  border-radius: var(--radius);
+  background: rgba(0, 184, 148, 0.1);
+  color: var(--green);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-show-answer:hover {
+  background: rgba(0, 184, 148, 0.2);
+}
+
+/* 정답 코드 표시 */
+.solution-box {
+  background: rgba(0, 184, 148, 0.08);
+  border: 1px solid rgba(0, 184, 148, 0.25);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 12px;
+}
+.solution-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 10px;
+}
+.solution-code {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.btn-copy-solution {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-copy-solution:hover {
+  opacity: 0.85;
+}
+
 /* 오른쪽 패널 코드 에디터 */
 .split-right .code-editor {
   flex: 1;

@@ -307,13 +307,44 @@ function escapeHtml(text) {
 // 힌트
 function revealHint() {
   state.showHint = true;
-  renderHint();
+  if (state.hintIndex < state.activeProblem.hints.length) {
+    renderHint();
+  }
 }
 
 function nextHint() {
   if (state.hintIndex < state.activeProblem.hints.length - 1) {
     state.hintIndex++;
     renderHint();
+  }
+}
+
+function showSolution() {
+  const area = document.getElementById("hint-area");
+  const p = state.activeProblem;
+  const sol = p.solution || "// 정답 코드가 준비되지 않았습니다.";
+
+  area.style.display = "block";
+  area.innerHTML = `
+    <div class="hint-box">
+      <div class="hint-title">&#128161; 힌트 ${p.hints.length} / ${p.hints.length}</div>
+      <div class="hint-text">${escapeHtml(p.hints[p.hints.length - 1])}</div>
+    </div>
+    <div class="solution-box">
+      <div class="solution-title">&#9989; 정답 코드</div>
+      <pre class="solution-code">${escapeHtml(sol)}</pre>
+      <button class="btn-copy-solution" onclick="copySolution()">코드 복사하기</button>
+    </div>`;
+}
+
+function copySolution() {
+  const p = state.activeProblem;
+  if (p.solution) {
+    navigator.clipboard.writeText(p.solution).then(() => {
+      const btn = document.querySelector(".btn-copy-solution");
+      btn.textContent = "복사 완료!";
+      setTimeout(() => btn.textContent = "코드 복사하기", 1500);
+    });
   }
 }
 
@@ -325,17 +356,24 @@ function renderHint() {
     return;
   }
 
+  const isLastHint = state.hintIndex >= p.hints.length - 1;
+
   area.style.display = "block";
   area.innerHTML = `
     <div class="hint-box">
       <div class="hint-title">&#128161; 힌트 ${state.hintIndex + 1} / ${p.hints.length}</div>
       <div class="hint-text">${escapeHtml(p.hints[state.hintIndex])}</div>
       ${
-        state.hintIndex < p.hints.length - 1
+        !isLastHint
           ? `<button class="btn-hint-more" onclick="nextHint()">다음 힌트 보기 &rarr;</button>`
           : ""
       }
-    </div>`;
+    </div>
+    ${
+      isLastHint && p.solution
+        ? `<button class="btn-show-answer" onclick="showSolution()">&#128269; 정답 보기</button>`
+        : ""
+    }`;
 }
 
 // ===================== 코드 실행 & 채점 =====================

@@ -16,7 +16,16 @@ const PROBLEMS = [
       hints: [
         "1부터 N까지 반복하면서 각 숫자를 문자열로 바꿔보세요",
         "split(d)하면 d가 몇 번 등장하는지 알 수 있어요",
+        "String(i).split(d).length - 1 이 i에서 d의 등장 횟수입니다",
+        "for문으로 1~N 돌면서 각각의 등장 횟수를 count에 누적하세요",
+        "최종 코드: let count=0; for(let i=1;i<=N;i++) count += String(i).split(d).length-1; console.log(count)",
       ],
+      solution: `const [N, d] = input.split(' ');
+let count = 0;
+for (let i = 1; i <= Number(N); i++) {
+  count += String(i).split(d).length - 1;
+}
+console.log(count);`,
       starter: `const [N, d] = input.split(' ');\n\n`,
     },
     {
@@ -38,8 +47,17 @@ const PROBLEMS = [
       ],
       hints: [
         "각 숫자의 개수를 세되, 6과 9는 합쳐서 세세요",
-        "6+9의 합을 Math.ceil로 2로 나누면 됩니다",
+        "배열 길이 10짜리를 만들어 각 숫자 빈도를 저장하세요",
+        "6과 9를 합친 후 Math.ceil로 2로 나누면 각각에 필요한 세트 수입니다",
+        "모든 숫자 빈도 중 최댓값이 필요한 세트 수예요",
+        "count[6]=Math.ceil((count[6]+count[9])/2); count[9]=count[6]; 후 Math.max(...count)",
       ],
+      solution: `const n = input;
+const count = new Array(10).fill(0);
+for (const ch of n) count[Number(ch)]++;
+count[6] = Math.ceil((count[6] + count[9]) / 2);
+count[9] = count[6];
+console.log(Math.max(...count));`,
       starter: `const n = input;\n\n`,
     },
     {
@@ -63,7 +81,20 @@ N (1 ≤ N ≤ 1,000)
       hints: [
         "배열을 큐처럼 사용하세요 (shift로 앞에서 빼기)",
         "shift → 버리기, shift → push로 뒤로 보내기",
+        "카드가 1장 남을 때까지 while문으로 반복하세요",
+        "버린 카드를 result 배열에 넣고 마지막에 join(' ')으로 출력",
+        "const q=[1..N]; while(q.length>1){result.push(q.shift()); q.push(q.shift());} result.push(q[0])",
       ],
+      solution: `const n = Number(input);
+const q = [];
+for (let i = 1; i <= n; i++) q.push(i);
+const result = [];
+while (q.length > 1) {
+  result.push(q.shift());
+  q.push(q.shift());
+}
+result.push(q[0]);
+console.log(result.join(' '));`,
       starter: `const n = Number(input);\n\n`,
     },
     {
@@ -87,7 +118,17 @@ N (1 ≤ N ≤ 1,000)
       hints: [
         "연속된 X의 길이가 홀수면 -1입니다",
         "XXXX → AAAA로 먼저 바꾸고, XX → BB로 바꾸세요",
+        "정규식 replace를 반복하면 편합니다",
+        "연속 X 그룹별로: 길이%2===1이면 -1, 4로 나눈 몫만큼 AAAA, 나머지/2만큼 BB",
+        "board.replace(/X+/g, m => m.length%2 ? null : 'AAAA'.repeat(m.length/4>>0) + 'BB'.repeat(m.length%4/2))",
       ],
+      solution: `const board = input;
+let fail = false;
+const result = board.replace(/X+/g, m => {
+  if (m.length % 2 === 1) { fail = true; return m; }
+  return 'AAAA'.repeat(Math.floor(m.length / 4)) + 'BB'.repeat((m.length % 4) / 2);
+});
+console.log(fail ? -1 : result);`,
       starter: `const board = input;\n\n`,
     },
     {
@@ -109,7 +150,18 @@ N (1 ≤ N ≤ 1,000)
       hints: [
         "한 자리가 될 때까지 자릿수 합을 반복하세요",
         "마지막 한 자리 수가 3, 6, 9이면 YES",
+        "X가 매우 클 수 있으므로 문자열로 처리해야 해요",
+        "while(x.length > 1) { x = 자릿수합을 문자열로; count++; }",
+        "자릿수 합: x.split('').reduce((s,c)=>s+Number(c),0) 후 String으로 변환",
       ],
+      solution: `let x = input;
+let count = 0;
+while (x.length > 1) {
+  x = String(x.split('').reduce((s, c) => s + Number(c), 0));
+  count++;
+}
+console.log(count);
+console.log(Number(x) % 3 === 0 ? 'YES' : 'NO');`,
       starter: `let x = input;\n\n`,
     },
     {
@@ -132,7 +184,24 @@ N (1 ≤ N ≤ 1,000)
       hints: [
         "다른 후보 중 가장 많은 표를 가진 사람부터 1표씩 빼앗으세요",
         "매번 최대 득표 후보에서 1표 빼고 다솜이에게 1표 추가",
+        "while문으로 다솜이가 단독 1위가 될 때까지 반복하세요",
+        "후보가 1명이면 답은 0, 아니면 매번 최대값 찾아서 처리",
+        "다솜이 votes[0], 나머지 중 max가 votes[0] 이상이면 max에서 -1, votes[0]에 +1, count++",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const votes = [];
+for (let i = 1; i <= n; i++) votes.push(Number(lines[i]));
+let count = 0;
+while (n > 1) {
+  const maxOther = Math.max(...votes.slice(1));
+  if (votes[0] > maxOther) break;
+  const idx = votes.indexOf(maxOther, 1);
+  votes[idx]--;
+  votes[0]++;
+  count++;
+}
+console.log(count);`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -154,7 +223,22 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "먼저 10진법으로 변환한 다음, B진법으로 바꾸세요",
         "B진법 변환: 나머지를 역순으로 모으면 됩니다",
+        "A진법→10진법: 각 자릿수 × A^(자릿수위치)를 합산",
+        "10진법→B진법: while(num>0) { result.unshift(num%B); num=Math.floor(num/B); }",
+        "num이 0이면 결과는 [0]으로 처리하세요",
       ],
+      solution: `const lines = input.split('\\n');
+const [A, B] = lines[0].split(' ').map(Number);
+const m = Number(lines[1]);
+const digits = lines[2].split(' ').map(Number);
+let num = 0;
+for (let i = 0; i < m; i++) num = num * A + digits[i];
+if (num === 0) { console.log(0); }
+else {
+  const result = [];
+  while (num > 0) { result.unshift(num % B); num = Math.floor(num / B); }
+  console.log(result.join(' '));
+}`,
       starter: `const lines = input.split('\\n');\nconst [A, B] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -178,7 +262,25 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "가로('-')는 왼쪽과 같으면 같은 판자, 다르면 새 판자",
         "세로('|')는 위쪽과 같으면 같은 판자, 다르면 새 판자",
+        "각 칸을 순회하면서 새 판자인지 판단하세요",
+        "'-'이면 왼쪽이 '-'인지, '|'이면 위쪽이 '|'인지 확인",
+        "새 판자 조건: 첫 행/열이거나, 해당 방향의 이전 칸과 다를 때 count++",
       ],
+      solution: `const lines = input.split('\\n');
+const [N, M] = lines[0].split(' ').map(Number);
+const board = [];
+for (let i = 1; i <= N; i++) board.push(lines[i]);
+let count = 0;
+for (let i = 0; i < N; i++) {
+  for (let j = 0; j < M; j++) {
+    if (board[i][j] === '-') {
+      if (j === 0 || board[i][j-1] !== '-') count++;
+    } else {
+      if (i === 0 || board[i-1][j] !== '|') count++;
+    }
+  }
+}
+console.log(count);`,
       starter: `const lines = input.split('\\n');\nconst [N, M] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -202,7 +304,22 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "날짜를 비교하려면 yyyy*10000 + mm*100 + dd로 숫자화하세요",
         "가장 큰 값이 나이 적은 사람, 가장 작은 값이 나이 많은 사람",
+        "각 학생의 이름과 날짜 숫자를 배열로 저장하세요",
+        "배열을 날짜 숫자 기준으로 정렬하면 첫번째가 가장 많고 마지막이 가장 적어요",
+        "sort((a,b)=>a.date-b.date) 후 마지막이 youngest, 첫번째가 oldest",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const students = [];
+for (let i = 1; i <= n; i++) {
+  const parts = lines[i].split(' ');
+  const name = parts[0];
+  const d = Number(parts[1]), m = Number(parts[2]), y = Number(parts[3]);
+  students.push({ name, date: y * 10000 + m * 100 + d });
+}
+students.sort((a, b) => a.date - b.date);
+console.log(students[students.length - 1].name);
+console.log(students[0].name);`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -224,7 +341,18 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "k를 1부터 늘려가며, 뒤에서 k자리가 모두 다른지 확인하세요",
         "Set을 사용해서 중복 체크를 하면 편합니다",
+        "각 학번의 slice(-k)를 Set에 넣고 크기가 N인지 확인",
+        "Set.size === N이면 그 k가 답입니다",
+        "for(let k=1;;k++) { const s=new Set(ids.map(id=>id.slice(-k))); if(s.size===N) return k; }",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const ids = [];
+for (let i = 1; i <= n; i++) ids.push(lines[i]);
+for (let k = 1; ; k++) {
+  const s = new Set(ids.map(id => id.slice(-k)));
+  if (s.size === n) { console.log(k); break; }
+}`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -248,7 +376,29 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "점수 내림차순 정렬 후, 나라별 수상자 수를 세세요",
         "같은 나라에서 이미 2명이 수상했으면 건너뛰세요",
+        "Map으로 나라별 수상 인원을 추적하세요",
+        "정렬 후 순회하면서, 나라카운트 < 2이면 수상자로 선택",
+        "3명 선택될 때까지 반복하고 각각 '나라 학생' 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const arr = [];
+for (let i = 1; i <= n; i++) {
+  const [c, s, p] = lines[i].split(' ').map(Number);
+  arr.push({ country: c, student: s, score: p });
+}
+arr.sort((a, b) => b.score - a.score);
+const countMap = {};
+let winners = 0;
+for (const a of arr) {
+  if (winners >= 3) break;
+  countMap[a.country] = (countMap[a.country] || 0);
+  if (countMap[a.country] < 2) {
+    countMap[a.country]++;
+    console.log(a.country + ' ' + a.student);
+    winners++;
+  }
+}`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -271,7 +421,20 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "Math.max, Math.min으로 최대 최소를 구하세요",
         "차이는 max - min 입니다",
+        "각 줄의 첫 번째 숫자는 학생 수, 나머지가 점수입니다",
+        "split(' ')로 나눈 후 slice(1)로 점수만 추출하세요",
+        "점수 배열에 Math.max(...scores), Math.min(...scores) 적용 후 포맷에 맞게 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const K = Number(lines[0]);
+for (let i = 1; i <= K; i++) {
+  const nums = lines[i].split(' ').map(Number);
+  const scores = nums.slice(1);
+  const max = Math.max(...scores);
+  const min = Math.min(...scores);
+  console.log('Class ' + i);
+  console.log('Max ' + max + ', Min ' + min + ', Largest gap ' + (max - min));
+}`,
       starter: `const lines = input.split('\\n');\nconst K = Number(lines[0]);\n\n`,
     },
     {
@@ -293,7 +456,35 @@ B진법 변환 결과 (높은 자리부터, 공백 구분)`,
       hints: [
         "정렬 후, 5개씩 묶어서 등차수열이 되는지 확인하세요",
         "두 수 사이의 공차를 구하고, 중간에 빠진 수를 세세요",
+        "모든 2개 조합(i,j)에서 공차를 구하고, 5개 등차수열에 포함되는 기존 수를 세세요",
+        "공차 d = (arr[j]-arr[i])/(j가 몇번째-i가 몇번째)가 아니라, 모든 가능한 d를 시도",
+        "정렬 후 모든 (i,j) 쌍에서 d=(arr[j]-arr[i])/k (k=1..4)로 5개 등차수열 시도, 기존 수 최대 매칭 수 찾기",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const arr = [];
+for (let i = 1; i <= n; i++) arr.push(Number(lines[i]));
+arr.sort((a, b) => a - b);
+const s = new Set(arr);
+let maxFound = 1;
+for (let i = 0; i < n; i++) {
+  for (let j = i + 1; j < n; j++) {
+    const diff = arr[j] - arr[i];
+    for (let pos = 0; pos < 5; pos++) {
+      for (let pos2 = pos + 1; pos2 < 5; pos2++) {
+        if (diff % (pos2 - pos) !== 0) continue;
+        const d = diff / (pos2 - pos);
+        const start = arr[i] - d * pos;
+        let cnt = 0;
+        for (let k = 0; k < 5; k++) {
+          if (s.has(start + d * k)) cnt++;
+        }
+        maxFound = Math.max(maxFound, cnt);
+      }
+    }
+  }
+}
+console.log(5 - maxFound);`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -319,7 +510,22 @@ D+ = 1.5, D0 = 1.0, F = 0.0, P는 계산에서 제외.
       hints: [
         "등급별 점수를 Map이나 객체로 매핑하세요",
         "P등급은 총학점과 합산에서 모두 제외합니다",
+        "grade가 'P'이면 continue로 건너뛰세요",
+        "totalCredit과 totalScore를 누적한 후 totalScore/totalCredit",
+        "toFixed(6)으로 소수점 6자리까지 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const gradeMap = {'A+':4.5,'A0':4.0,'B+':3.5,'B0':3.0,'C+':2.5,'C0':2.0,'D+':1.5,'D0':1.0,'F':0.0};
+let totalCredit = 0, totalScore = 0;
+for (let i = 0; i < 20; i++) {
+  const parts = lines[i].split(' ');
+  const credit = parseFloat(parts[1]);
+  const grade = parts[2];
+  if (grade === 'P') continue;
+  totalCredit += credit;
+  totalScore += credit * gradeMap[grade];
+}
+console.log((totalScore / totalCredit).toFixed(6));`,
       starter: `const lines = input.split('\\n');\n\n`,
     },
     {
@@ -342,7 +548,22 @@ D+ = 1.5, D0 = 1.0, F = 0.0, P는 계산에서 제외.
       hints: [
         "정렬 후 앞뒤 Math.round(n*0.15)개를 제외하세요",
         "남은 수의 평균을 Math.round로 반올림하세요",
+        "n이 0이면 바로 0 출력하고 종료",
+        "제외할 개수: cut = Math.round(n * 0.15)",
+        "slice(cut, n-cut)로 남은 배열의 합을 남은 개수로 나누고 Math.round",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+if (n === 0) { console.log(0); }
+else {
+  const arr = [];
+  for (let i = 1; i <= n; i++) arr.push(Number(lines[i]));
+  arr.sort((a, b) => a - b);
+  const cut = Math.round(n * 0.15);
+  const remain = arr.slice(cut, n - cut);
+  const avg = remain.reduce((s, v) => s + v, 0) / remain.length;
+  console.log(Math.round(avg));
+}`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -374,7 +595,26 @@ back: 뒤 원소 출력 (비어있으면 -1)
       hints: [
         "배열을 사용하고 unshift/push/shift/pop을 활용하세요",
         "각 명령에 따라 분기 처리하세요",
+        "if/else if 또는 switch문으로 8가지 명령을 처리하세요",
+        "출력이 있는 명령만 console.log 하세요 (push는 출력 없음)",
+        "deq.length===0이면 -1 출력, 아니면 shift/pop 결과 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const deq = [];
+const result = [];
+for (let i = 1; i <= N; i++) {
+  const cmd = lines[i];
+  if (cmd.startsWith('push_front')) { deq.unshift(Number(cmd.split(' ')[1])); }
+  else if (cmd.startsWith('push_back')) { deq.push(Number(cmd.split(' ')[1])); }
+  else if (cmd === 'pop_front') { result.push(deq.length ? deq.shift() : -1); }
+  else if (cmd === 'pop_back') { result.push(deq.length ? deq.pop() : -1); }
+  else if (cmd === 'size') { result.push(deq.length); }
+  else if (cmd === 'empty') { result.push(deq.length ? 0 : 1); }
+  else if (cmd === 'front') { result.push(deq.length ? deq[0] : -1); }
+  else if (cmd === 'back') { result.push(deq.length ? deq[deq.length-1] : -1); }
+}
+console.log(result.join('\\n'));`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -403,7 +643,26 @@ check 연산 결과만 출력`,
       hints: [
         "Set을 사용하면 간편합니다",
         "all은 1~20을 모두 넣고, empty는 clear하세요",
+        "check일 때만 결과를 출력(console.log)하면 됩니다",
+        "toggle: s.has(x) ? s.delete(x) : s.add(x)",
+        "result 배열에 check 결과를 모아서 마지막에 join('\\n')으로 출력하면 빠릅니다",
       ],
+      solution: `const lines = input.split('\\n');
+const M = Number(lines[0]);
+const s = new Set();
+const result = [];
+for (let i = 1; i <= M; i++) {
+  const parts = lines[i].split(' ');
+  const cmd = parts[0];
+  const x = Number(parts[1]);
+  if (cmd === 'add') s.add(x);
+  else if (cmd === 'remove') s.delete(x);
+  else if (cmd === 'check') result.push(s.has(x) ? 1 : 0);
+  else if (cmd === 'toggle') s.has(x) ? s.delete(x) : s.add(x);
+  else if (cmd === 'all') { s.clear(); for(let j=1;j<=20;j++) s.add(j); }
+  else if (cmd === 'empty') s.clear();
+}
+console.log(result.join('\\n'));`,
       starter: `const lines = input.split('\\n');\nconst M = Number(lines[0]);\n\n`,
     },
     {
@@ -425,7 +684,24 @@ K번째로 지워지는 수`,
       hints: [
         "소수의 배수를 지울 때, 자기 자신도 '지워지는 것'에 포함합니다",
         "지울 때마다 카운트하고, K번째에 출력하세요",
+        "erased 배열로 지워진 여부를 관리하세요",
+        "2부터 순회하며 지워지지 않은 수 p를 찾고, p, 2p, 3p... 순으로 지워가며 카운트",
+        "count가 K가 되는 순간의 수를 출력하고 종료",
       ],
+      solution: `const [N, K] = input.split(' ').map(Number);
+const erased = new Array(N + 1).fill(false);
+let count = 0;
+for (let i = 2; i <= N; i++) {
+  if (erased[i]) continue;
+  for (let j = i; j <= N; j += i) {
+    if (!erased[j]) {
+      erased[j] = true;
+      count++;
+      if (count === K) { console.log(j); break; }
+    }
+  }
+  if (count >= K) break;
+}`,
       starter: `const [N, K] = input.split(' ').map(Number);\n\n`,
     },
     {
@@ -450,7 +726,24 @@ A×B 행렬 (공백 구분)`,
       hints: [
         "C[i][j] = sum(A[i][k] * B[k][j]) for k in 0..M-1",
         "3중 for문으로 구현하세요",
+        "결과 행렬 크기는 N×K 입니다",
+        "행렬 A와 B를 2차원 배열로 파싱한 후 곱셈 수행",
+        "result[i][j] += A[i][k] * B[k][j] 를 모든 k에 대해 합산",
       ],
+      solution: `const lines = input.split('\\n');
+let idx = 0;
+const [N, M1] = lines[idx++].split(' ').map(Number);
+const A = [];
+for (let i = 0; i < N; i++) A.push(lines[idx++].split(' ').map(Number));
+const [M2, K] = lines[idx++].split(' ').map(Number);
+const B = [];
+for (let i = 0; i < M2; i++) B.push(lines[idx++].split(' ').map(Number));
+const C = Array.from({length: N}, () => new Array(K).fill(0));
+for (let i = 0; i < N; i++)
+  for (let j = 0; j < K; j++)
+    for (let k = 0; k < M1; k++)
+      C[i][j] += A[i][k] * B[k][j];
+console.log(C.map(r => r.join(' ')).join('\\n'));`,
       starter: `const lines = input.split('\\n');\n\n`,
     },
     {
@@ -472,7 +765,24 @@ A×B 행렬 (공백 구분)`,
       hints: [
         "뒤에서부터 a[i-1] > a[i]인 지점을 찾으세요",
         "a[i-1]보다 작은 수 중 가장 큰 수와 교환 후, i부터 끝까지 내림차순 정렬",
+        "다음 순열의 반대 개념입니다 - 감소하는 지점을 찾아요",
+        "i를 못 찾으면 (이미 최소 순열이면) -1 출력",
+        "교환 후 i~끝을 reverse 하면 내림차순이 됩니다",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const a = lines[1].split(' ').map(Number);
+let i = n - 1;
+while (i > 0 && a[i - 1] <= a[i]) i--;
+if (i === 0) { console.log(-1); }
+else {
+  let j = n - 1;
+  while (a[j] >= a[i - 1]) j--;
+  [a[i-1], a[j]] = [a[j], a[i-1]];
+  const left = a.slice(0, i);
+  const right = a.slice(i).reverse();
+  console.log(left.concat(right).join(' '));
+}`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -498,7 +808,31 @@ TIMING의 최종 자산`,
       hints: [
         "BNP: 매일 현금//주가 만큼 매수",
         "TIMING: 연속 상승/하락 일수를 세서 3일 되면 매도/매수",
+        "최종 자산 = 현금 + 주식수 × 마지막날 주가",
+        "TIMING의 연속 카운트: 상승이면 up++, down=0 / 하락이면 down++, up=0",
+        "3일 연속 하락 시 전량매수(현금/주가만큼), 3일 연속 상승 시 전량매도(현금+=주식*주가)",
       ],
+      solution: `const lines = input.split('\\n');
+const cash = Number(lines[0]);
+const prices = lines[1].split(' ').map(Number);
+let bnpCash = cash, bnpStock = 0;
+let timCash = cash, timStock = 0;
+let up = 0, down = 0;
+for (let i = 0; i < 14; i++) {
+  const p = prices[i];
+  const buy = Math.floor(bnpCash / p);
+  bnpCash -= buy * p;
+  bnpStock += buy;
+  if (i > 0) {
+    if (prices[i] > prices[i-1]) { up++; down = 0; }
+    else if (prices[i] < prices[i-1]) { down++; up = 0; }
+    else { up = 0; down = 0; }
+  }
+  if (down >= 3) { const b = Math.floor(timCash / p); timCash -= b * p; timStock += b; }
+  if (up >= 3) { timCash += timStock * p; timStock = 0; }
+}
+console.log('BNP ' + (bnpCash + bnpStock * prices[13]));
+console.log('TIMING ' + (timCash + timStock * prices[13]));`,
       starter: `const lines = input.split('\\n');\nconst cash = Number(lines[0]);\n\n`,
     },
     {
@@ -525,7 +859,28 @@ TIMING의 최종 자산`,
       hints: [
         "머리를 찾고 한 칸 아래가 심장입니다",
         "심장에서 좌우로 1의 길이가 팔, 아래로 몸통, 몸통 끝에서 좌우가 다리",
+        "머리: 가장 위에 1이 있는 칸, 심장: (머리행+1, 머리열)",
+        "왼팔: 심장에서 왼쪽으로 1인 칸 수, 오른팔: 오른쪽으로",
+        "허리: 심장 아래로 1인 칸 수, 허리 끝에서 왼쪽/오른쪽 아래로 다리",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const grid = [];
+for (let i = 1; i <= N; i++) grid.push(lines[i]);
+let hr, hc;
+outer: for (let i = 0; i < N; i++)
+  for (let j = 0; j < grid[i].length; j++)
+    if (grid[i][j] === '1') { hr = i + 1; hc = j; break outer; }
+const sr = hr, sc = hc;
+let leftArm = 0, rightArm = 0, waist = 0, leftLeg = 0, rightLeg = 0;
+for (let j = sc - 1; j >= 0 && grid[sr][j] === '1'; j--) leftArm++;
+for (let j = sc + 1; j < grid[sr].length && grid[sr][j] === '1'; j++) rightArm++;
+let wr = sr + 1;
+while (wr < N && grid[wr][sc] === '1') { waist++; wr++; }
+for (let i = wr; i < N && grid[i][sc-1] === '1'; i++) leftLeg++;
+for (let i = wr; i < N && grid[i][sc+1] === '1'; i++) rightLeg++;
+console.log((sr + 1) + ' ' + (sc + 1));
+console.log(leftArm + ' ' + rightArm + ' ' + waist + ' ' + leftLeg + ' ' + rightLeg);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -547,7 +902,28 @@ TIMING의 최종 자산`,
       hints: [
         "2×2를 정렬해서 두 번째로 큰 값(인덱스 2)을 취하세요",
         "크기가 1이 될 때까지 반복",
+        "4개를 정렬하면 [a,b,c,d] 중 인덱스 2가 두 번째로 큰 값",
+        "새 행렬을 만들어 절반 크기로 줄여나가세요",
+        "while(size>1) { 새 size/2 행렬 생성, 2×2마다 두번째 큰 값으로 채움 }",
       ],
+      solution: `const lines = input.split('\\n');
+let N = Number(lines[0]);
+let mat = [];
+for (let i = 1; i <= N; i++) mat.push(lines[i].split(' ').map(Number));
+while (N > 1) {
+  const half = N / 2;
+  const next = Array.from({length: half}, () => new Array(half));
+  for (let i = 0; i < half; i++) {
+    for (let j = 0; j < half; j++) {
+      const vals = [mat[i*2][j*2], mat[i*2][j*2+1], mat[i*2+1][j*2], mat[i*2+1][j*2+1]];
+      vals.sort((a,b) => a - b);
+      next[i][j] = vals[2];
+    }
+  }
+  mat = next;
+  N = half;
+}
+console.log(mat[0][0]);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -570,7 +946,24 @@ TIMING의 최종 자산`,
       hints: [
         "100×100 배열을 만들고 각 종이 영역마다 +1 하세요",
         "값이 정확히 1인 칸을 세면 됩니다",
+        "x1~x2-1, y1~y2-1 범위를 +1 하세요 (좌표계 주의)",
+        "2중 for문으로 각 종이의 영역을 grid에 +1",
+        "마지막에 grid 전체 순회하며 값이 1인 칸 카운트",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const grid = Array.from({length: 101}, () => new Array(101).fill(0));
+for (let i = 1; i <= N; i++) {
+  const [x1, y1, x2, y2] = lines[i].split(' ').map(Number);
+  for (let x = x1; x < x2; x++)
+    for (let y = y1; y < y2; y++)
+      grid[x][y]++;
+}
+let count = 0;
+for (let x = 0; x < 101; x++)
+  for (let y = 0; y < 101; y++)
+    if (grid[x][y] === 1) count++;
+console.log(count);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -597,7 +990,27 @@ TIMING의 최종 자산`,
       hints: [
         "모음 여부를 판별하는 함수를 먼저 만드세요",
         "4가지 규칙을 모두 체크하고, 하나라도 위반하면 not acceptable",
+        "'aeiou'.includes(ch)로 모음 판별 가능",
+        "연속 모음/자음 카운트와 이전 문자 추적이 필요해요",
+        "for문으로 순회하며: 모음존재체크, 연속모음3체크, 연속자음3체크, 같은글자2연속(ee,oo제외) 체크",
       ],
+      solution: `const lines = input.split('\\n');
+const vowels = 'aeiou';
+for (const pw of lines) {
+  if (pw === 'end') break;
+  let ok = true;
+  let hasVowel = false, vc = 0, cc = 0, prev = '';
+  for (const ch of pw) {
+    const isV = vowels.includes(ch);
+    if (isV) { hasVowel = true; vc++; cc = 0; }
+    else { cc++; vc = 0; }
+    if (vc >= 3 || cc >= 3) { ok = false; break; }
+    if (ch === prev && ch !== 'e' && ch !== 'o') { ok = false; break; }
+    prev = ch;
+  }
+  if (!hasVowel) ok = false;
+  console.log('<' + pw + '> is ' + (ok ? 'acceptable' : 'not acceptable') + '.');
+}`,
       starter: `const lines = input.split('\\n');\n\n`,
     },
     {
@@ -617,7 +1030,20 @@ N K (1 ≤ K ≤ N ≤ 1,000)
       hints: [
         "배열에서 인덱스를 K-1씩 이동하며 제거하세요",
         "인덱스가 배열 길이를 넘으면 나머지 연산(%)을 사용하세요",
+        "현재 인덱스 = (현재인덱스 + K - 1) % 남은인원수",
+        "splice(idx, 1)로 해당 위치 제거 후 result에 추가",
+        "결과를 '<' + result.join(', ') + '>' 형식으로 출력",
       ],
+      solution: `const [N, K] = input.split(' ').map(Number);
+const arr = [];
+for (let i = 1; i <= N; i++) arr.push(i);
+const result = [];
+let idx = 0;
+while (arr.length > 0) {
+  idx = (idx + K - 1) % arr.length;
+  result.push(arr.splice(idx, 1)[0]);
+}
+console.log('<' + result.join(', ') + '>');`,
       starter: `const [N, K] = input.split(' ').map(Number);\n\n`,
     },
     {
@@ -637,7 +1063,23 @@ N K (1 ≤ K ≤ N ≤ 1,000)
       hints: [
         "5장에서 3장을 고르는 모든 조합을 탐색하세요",
         "5C3 = 10가지밖에 안 됩니다. 3중 for문으로 충분해요",
+        "모든 팀원에 대해 각각 최대 합을 구하고, 그 중 최대",
+        "3중 for문: for i, for j>i, for k>j => cards[i]+cards[j]+cards[k]",
+        "합이 100 이하이면서 최대인 값을 추적, 전체 팀원 중 최대 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+let best = 0;
+for (let t = 1; t <= N; t++) {
+  const cards = lines[t].split(' ').map(Number);
+  for (let i = 0; i < 5; i++)
+    for (let j = i + 1; j < 5; j++)
+      for (let k = j + 1; k < 5; k++) {
+        const s = cards[i] + cards[j] + cards[k];
+        if (s <= 100 && s > best) best = s;
+      }
+}
+console.log(best);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -671,7 +1113,27 @@ ____"라고 답변하였지."
       hints: [
         "재귀함수를 실제로 만들어서 깊이별로 출력하세요",
         "들여쓰기는 '____'.repeat(depth)로 만들 수 있어요",
+        "깊이가 N이면 '라고 답변하였지.'만 출력하고 리턴",
+        "깊이가 N 미만이면 질문→이야기→재귀호출→답변 순으로 출력",
+        "function rec(d) { print(indent+'질문'); if(d===N) {print(indent+'답변');} else {print(indent+'이야기'); rec(d+1); print(indent+'답변');} }",
       ],
+      solution: `const n = Number(input);
+const result = [];
+function rec(depth) {
+  const indent = '____'.repeat(depth);
+  result.push(indent + '"재귀함수가 뭔가요?"');
+  if (depth === n) {
+    result.push(indent + '"라고 답변하였지."');
+  } else {
+    result.push(indent + '"잘 들어보게. 옛날옛날 , , , 한 , , , 마을에 , , , , , , 마을에 , , , 한 , , , 프로그래머가 살았다네."');
+    rec(depth + 1);
+    result.push(indent + '"라고 답변하였지."');
+  }
+}
+result.push('"재귀함수가 뭔가요?"');
+result.push('"잘 들어보게. 옛날옛날 , , , 한 , , , 마을에 , , , , , , 마을에 , , , 한 , , , 프로그래머가 살았다네."');
+rec(1);
+console.log(result.join('\\n'));`,
       starter: `const n = Number(input);\n\n`,
     },
     {
@@ -700,7 +1162,27 @@ ____"라고 답변하였지."
       hints: [
         "모든 가능한 8×8 시작점을 탐색하세요 (완전탐색)",
         "각 시작점에서 B시작/W시작 두 경우 모두 세보세요",
+        "(i+j)%2로 체스판 패턴을 만들 수 있어요",
+        "시작점(r,c)에서 8×8 영역 내 불일치 수를 두 패턴 모두 계산",
+        "B시작 불일치 = count, W시작 불일치 = 64-count. 전체 시작점 중 최솟값 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const [N, M] = lines[0].split(' ').map(Number);
+const board = [];
+for (let i = 1; i <= N; i++) board.push(lines[i]);
+let minCost = 64;
+for (let r = 0; r <= N - 8; r++) {
+  for (let c = 0; c <= M - 8; c++) {
+    let cnt = 0;
+    for (let i = 0; i < 8; i++)
+      for (let j = 0; j < 8; j++) {
+        const expected = (i + j) % 2 === 0 ? 'B' : 'W';
+        if (board[r+i][c+j] !== expected) cnt++;
+      }
+    minCost = Math.min(minCost, cnt, 64 - cnt);
+  }
+}
+console.log(minCost);`,
       starter: `const lines = input.split('\\n');\nconst [N, M] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -721,7 +1203,26 @@ ____"라고 답변하였지."
       hints: [
         "각 사람마다 나보다 몸무게 AND 키 모두 큰 사람 수를 세세요",
         "O(N²) 이중 for문으로 충분합니다",
+        "등수 = 나보다 큰 사람 수 + 1",
+        "people[j].w > people[i].w && people[j].h > people[i].h 이면 카운트++",
+        "각 사람의 등수를 배열에 저장 후 join(' ')으로 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const people = [];
+for (let i = 1; i <= n; i++) {
+  const [w, h] = lines[i].split(' ').map(Number);
+  people.push({ w, h });
+}
+const ranks = [];
+for (let i = 0; i < n; i++) {
+  let rank = 1;
+  for (let j = 0; j < n; j++) {
+    if (people[j].w > people[i].w && people[j].h > people[i].h) rank++;
+  }
+  ranks.push(rank);
+}
+console.log(ranks.join(' '));`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -742,7 +1243,24 @@ ____"라고 답변하였지."
       hints: [
         "100×100 배열을 만들고, 각 색종이 영역을 1로 채우세요",
         "1의 개수를 세면 넓이입니다",
+        "x~x+9, y~y+9 범위를 1로 마킹",
+        "겹치는 부분은 이미 1이므로 자동으로 중복 제거됩니다",
+        "grid 전체 순회하며 1인 칸 수를 세서 출력",
       ],
+      solution: `const lines = input.split('\\n');
+const n = Number(lines[0]);
+const grid = Array.from({length: 100}, () => new Array(100).fill(0));
+for (let i = 1; i <= n; i++) {
+  const [x, y] = lines[i].split(' ').map(Number);
+  for (let dx = 0; dx < 10; dx++)
+    for (let dy = 0; dy < 10; dy++)
+      grid[x + dx][y + dy] = 1;
+}
+let count = 0;
+for (let i = 0; i < 100; i++)
+  for (let j = 0; j < 100; j++)
+    count += grid[i][j];
+console.log(count);`,
       starter: `const lines = input.split('\\n');\nconst n = Number(lines[0]);\n\n`,
     },
     {
@@ -762,7 +1280,20 @@ N K (1 ≤ K ≤ N ≤ 5,000)
       hints: [
         "배열을 원형으로 생각하고 인덱스를 % 연산으로 관리하세요",
         "splice로 해당 위치의 원소를 제거하세요",
+        "요세푸스 문제 0과 동일한 풀이입니다",
+        "idx = (idx + K - 1) % arr.length 로 K번째를 찾고 제거",
+        "결과를 '<' + result.join(', ') + '>'로 출력",
       ],
+      solution: `const [N, K] = input.split(' ').map(Number);
+const arr = [];
+for (let i = 1; i <= N; i++) arr.push(i);
+const result = [];
+let idx = 0;
+while (arr.length > 0) {
+  idx = (idx + K - 1) % arr.length;
+  result.push(arr.splice(idx, 1)[0]);
+}
+console.log('<' + result.join(', ') + '>');`,
       starter: `const [N, K] = input.split(' ').map(Number);\n\n`,
     },
     {
@@ -783,7 +1314,30 @@ M번째 문서의 인쇄 순서`,
       hints: [
         "큐에 {중요도, 원래인덱스}를 넣으세요",
         "최대 중요도가 아니면 뒤로 보내고, 맞으면 인쇄 카운트+1",
+        "인쇄된 문서의 원래인덱스가 M이면 그때의 카운트가 답",
+        "while문으로 큐 앞을 확인: Math.max보다 작으면 push, 아니면 인쇄",
+        "queue.shift() 후 queue.some(q => q.pri > cur.pri) 이면 다시 push",
       ],
+      solution: `const lines = input.split('\\n');
+const T = Number(lines[0]);
+const result = [];
+let idx = 1;
+for (let t = 0; t < T; t++) {
+  const [N, M] = lines[idx++].split(' ').map(Number);
+  const pris = lines[idx++].split(' ').map(Number);
+  const queue = pris.map((p, i) => ({ pri: p, idx: i }));
+  let count = 0;
+  while (queue.length > 0) {
+    const cur = queue.shift();
+    if (queue.some(q => q.pri > cur.pri)) {
+      queue.push(cur);
+    } else {
+      count++;
+      if (cur.idx === M) { result.push(count); break; }
+    }
+  }
+}
+console.log(result.join('\\n'));`,
       starter: `const lines = input.split('\\n');\nconst T = Number(lines[0]);\n\n`,
     },
     {
@@ -808,7 +1362,27 @@ M번째 문서의 인쇄 순서`,
       hints: [
         "정렬 후 중앙값은 arr[Math.floor(N/2)]",
         "최빈값: 빈도를 세고, 최빈값이 여러 개면 정렬 후 두 번째",
+        "산술평균: Math.round(합/N)",
+        "빈도 세기: Map으로 각 수의 등장 횟수를 관리",
+        "최빈값이 여러 개일 때: 빈도 같은 값들을 정렬해서 두 번째(인덱스 1) 선택",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const arr = [];
+for (let i = 1; i <= N; i++) arr.push(Number(lines[i]));
+arr.sort((a, b) => a - b);
+const avg = Math.round(arr.reduce((s, v) => s + v, 0) / N);
+const mid = arr[Math.floor(N / 2)];
+const freq = new Map();
+for (const v of arr) freq.set(v, (freq.get(v) || 0) + 1);
+const maxFreq = Math.max(...freq.values());
+const modes = [...freq.entries()].filter(([k, v]) => v === maxFreq).map(([k]) => k).sort((a, b) => a - b);
+const mode = modes.length >= 2 ? modes[1] : modes[0];
+const range = arr[N - 1] - arr[0];
+console.log(avg);
+console.log(mid);
+console.log(mode);
+console.log(range);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -823,23 +1397,41 @@ M번째 문서의 인쇄 순서`,
 【출력】
 뒤집은 결과`,
       testCases: [
-        {
-          input: "baekjoon online judge",
-          output: "noojkeab enilno egduj",
-        },
-        {
-          input: "<open>tag<close>",
-          output: "<open>gat<close>",
-        },
-        {
-          input: "<ab cd>ef gh<ij kl>",
-          output: "<ab cd>fe hg<ij kl>",
-        },
+        { input: "baekjoon online judge", output: "noojkeab enilno egduj" },
+        { input: "<open>tag<close>", output: "<open>gat<close>" },
+        { input: "<ab cd>ef gh<ij kl>", output: "<ab cd>fe hg<ij kl>" },
       ],
       hints: [
         "태그 안인지 밖인지 상태를 추적하세요",
         "태그 밖에서 공백이나 '<'를 만나면 지금까지 모은 단어를 뒤집어서 추가",
+        "inTag 플래그를 사용: '<' 만나면 true, '>' 만나면 false",
+        "태그 밖에서 단어를 모으다가 공백/<를 만나면 뒤집어서 result에 추가",
+        "단어 버퍼(word)를 관리: 태그밖에서 일반문자면 word+=ch, 그 외 경우 word를 reverse하고 flush",
       ],
+      solution: `const s = input;
+let result = '';
+let word = '';
+let inTag = false;
+for (const ch of s) {
+  if (ch === '<') {
+    result += word.split('').reverse().join('');
+    word = '';
+    inTag = true;
+    result += ch;
+  } else if (ch === '>') {
+    inTag = false;
+    result += ch;
+  } else if (inTag) {
+    result += ch;
+  } else if (ch === ' ') {
+    result += word.split('').reverse().join('') + ' ';
+    word = '';
+  } else {
+    word += ch;
+  }
+}
+result += word.split('').reverse().join('');
+console.log(result);`,
       starter: `const s = input;\n\n`,
     },
     {
@@ -864,7 +1456,25 @@ M번째 문서의 인쇄 순서`,
       hints: [
         "누적합(prefix sum)을 사용하면 빠릅니다",
         "단순히 2중 for문으로 구간합을 구해도 됩니다",
+        "각 질의마다 (i,j)~(x,y) 범위를 2중 for문으로 합산",
+        "인덱스가 1-based임에 주의하세요",
+        "for(r=i-1; r<x; r++) for(c=j-1; c<y; c++) sum += arr[r][c]",
       ],
+      solution: `const lines = input.split('\\n');
+const [N, M] = lines[0].split(' ').map(Number);
+const arr = [];
+for (let i = 1; i <= N; i++) arr.push(lines[i].split(' ').map(Number));
+const K = Number(lines[N + 1]);
+const result = [];
+for (let q = 0; q < K; q++) {
+  const [i, j, x, y] = lines[N + 2 + q].split(' ').map(Number);
+  let sum = 0;
+  for (let r = i - 1; r < x; r++)
+    for (let c = j - 1; c < y; c++)
+      sum += arr[r][c];
+  result.push(sum);
+}
+console.log(result.join('\\n'));`,
       starter: `const lines = input.split('\\n');\nconst [N, M] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -890,7 +1500,34 @@ M번째 문서의 인쇄 순서`,
       hints: [
         "남자: 번호의 배수 위치를 모두 toggle",
         "여자: 번호 위치에서 좌우로 같은 값인 동안 확장 후 toggle",
+        "toggle: sw[i] = 1 - sw[i] 또는 sw[i] ^= 1",
+        "여자: 중심에서 좌우를 1칸씩 확장, sw[left]===sw[right]일 때까지",
+        "출력 시 20개씩 끊어서 출력 (slice(0,20), slice(20,40), ...)",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const sw = lines[1].split(' ').map(Number);
+const S = Number(lines[2]);
+for (let s = 0; s < S; s++) {
+  const [gender, num] = lines[3 + s].split(' ').map(Number);
+  if (gender === 1) {
+    for (let i = num - 1; i < N; i += num) sw[i] ^= 1;
+  } else {
+    const c = num - 1;
+    sw[c] ^= 1;
+    let d = 1;
+    while (c - d >= 0 && c + d < N && sw[c - d] === sw[c + d]) {
+      sw[c - d] ^= 1;
+      sw[c + d] ^= 1;
+      d++;
+    }
+  }
+}
+const result = [];
+for (let i = 0; i < N; i += 20) {
+  result.push(sw.slice(i, i + 20).join(' '));
+}
+console.log(result.join('\\n'));`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -912,7 +1549,26 @@ M번째 문서의 인쇄 순서`,
       hints: [
         "홀수 개인 문자가 2개 이상이면 불가능",
         "짝수 개인 문자의 절반을 정렬 + 홀수문자 중앙 + 역순",
+        "각 문자의 빈도를 세세요",
+        "홀수 빈도 문자가 0 또는 1개여야 팰린드롬 가능",
+        "절반 문자를 정렬하고 + 중앙문자(있으면) + 절반역순으로 조합",
       ],
+      solution: `const s = input;
+const freq = {};
+for (const ch of s) freq[ch] = (freq[ch] || 0) + 1;
+let oddCount = 0, oddChar = '';
+const half = [];
+for (const [ch, cnt] of Object.entries(freq)) {
+  if (cnt % 2 === 1) { oddCount++; oddChar = ch; }
+  for (let i = 0; i < Math.floor(cnt / 2); i++) half.push(ch);
+}
+if (oddCount > 1) { console.log("I'm Sorry Hansoo"); }
+else {
+  half.sort();
+  const left = half.join('');
+  const right = half.reverse().join('');
+  console.log(left + (oddCount ? oddChar : '') + right);
+}`,
       starter: `const s = input;\n\n`,
     },
     {
@@ -933,7 +1589,25 @@ M번째 문서의 인쇄 순서`,
       hints: [
         "가능한 크기를 큰 것부터 시도하세요",
         "네 꼭짓점: (i,j), (i,j+d), (i+d,j), (i+d,j+d)가 모두 같은지 확인",
+        "d를 min(N,M)-1부터 0까지 줄여가며 탐색",
+        "처음 발견되면 (d+1)*(d+1)을 출력하고 종료",
+        "3중 for문: for d, for i(0~N-d-1), for j(0~M-d-1) => 네 꼭짓점 비교",
       ],
+      solution: `const lines = input.split('\\n');
+const [N, M] = lines[0].split(' ').map(Number);
+const board = [];
+for (let i = 1; i <= N; i++) board.push(lines[i]);
+for (let d = Math.min(N, M) - 1; d >= 0; d--) {
+  for (let i = 0; i + d < N; i++) {
+    for (let j = 0; j + d < M; j++) {
+      const v = board[i][j];
+      if (board[i][j+d] === v && board[i+d][j] === v && board[i+d][j+d] === v) {
+        console.log((d + 1) * (d + 1));
+        return;
+      }
+    }
+  }
+}`,
       starter: `const lines = input.split('\\n');\nconst [N, M] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -957,7 +1631,23 @@ K번 나라의 등수`,
       hints: [
         "K번 나라보다 (금,은,동) 순으로 큰 나라 수를 세세요",
         "등수 = 나보다 위인 사람 수 + 1",
+        "먼저 K번 나라의 메달 정보를 찾으세요",
+        "다른 모든 나라와 비교: 금이 더 많거나, 금 같고 은이 더 많거나, 금은 같고 동이 더 많으면",
+        "rank = 나보다 (금,은,동) 순으로 큰 나라 수 + 1",
       ],
+      solution: `const lines = input.split('\\n');
+const [N, K] = lines[0].split(' ').map(Number);
+const countries = [];
+for (let i = 1; i <= N; i++) {
+  const [id, g, s, b] = lines[i].split(' ').map(Number);
+  countries.push({ id, g, s, b });
+}
+const me = countries.find(c => c.id === K);
+let rank = 1;
+for (const c of countries) {
+  if (c.g > me.g || (c.g === me.g && c.s > me.s) || (c.g === me.g && c.s === me.s && c.b > me.b)) rank++;
+}
+console.log(rank);`,
       starter: `const lines = input.split('\\n');\nconst [N, K] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -978,7 +1668,18 @@ K번 나라의 등수`,
       hints: [
         "키가 큰 사람부터 (N부터 1까지) 배치하세요",
         "또는 키가 작은 사람부터 빈 자리에 삽입하세요",
+        "키 N인 사람: 빈 자리 중 앞에서 (자신의값+1)번째에 삽입",
+        "결과 배열에 splice로 해당 위치에 삽입",
+        "for i=N downto 1: result.splice(info[i-1], 0, i) — 가장 큰 사람부터 넣으면 위치가 정확",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const info = lines[1].split(' ').map(Number);
+const result = [];
+for (let i = N; i >= 1; i--) {
+  result.splice(info[i - 1], 0, i);
+}
+console.log(result.join(' '));`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -1001,7 +1702,23 @@ K번 나라의 등수`,
       hints: [
         "100×100 배열을 만들고 각 직사각형 영역을 표시하세요",
         "표시된 칸 수를 세면 면적입니다",
+        "x1~x2-1, y1~y2-1 범위를 1로 채우세요",
+        "4개 직사각형 모두 처리 후 1인 칸 카운트",
+        "grid[x][y] = 1로 마킹, 마지막에 전체 합산",
       ],
+      solution: `const lines = input.split('\\n');
+const grid = Array.from({length: 101}, () => new Array(101).fill(0));
+for (let i = 0; i < 4; i++) {
+  const [x1, y1, x2, y2] = lines[i].split(' ').map(Number);
+  for (let x = x1; x < x2; x++)
+    for (let y = y1; y < y2; y++)
+      grid[x][y] = 1;
+}
+let count = 0;
+for (let x = 0; x < 101; x++)
+  for (let y = 0; y < 101; y++)
+    count += grid[x][y];
+console.log(count);`,
       starter: `const lines = input.split('\\n');\n\n`,
     },
     {
@@ -1022,7 +1739,34 @@ K번 나라의 등수`,
       hints: [
         "123~987 중 서로 다른 3자리 수를 모두 시도하세요 (완전탐색)",
         "각 후보에 대해 모든 질문의 스트라이크/볼이 맞는지 확인",
+        "0이 포함된 수와 중복 숫자가 있는 수는 제외",
+        "스트라이크: 같은 위치에 같은 숫자, 볼: 다른 위치에 같은 숫자",
+        "모든 질문을 만족하는 후보 수를 카운트",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const queries = [];
+for (let i = 1; i <= N; i++) {
+  const [num, s, b] = lines[i].split(' ');
+  queries.push({ num, s: Number(s), b: Number(b) });
+}
+let count = 0;
+for (let n = 123; n <= 987; n++) {
+  const ds = String(n);
+  if (ds.includes('0')) continue;
+  if (ds[0] === ds[1] || ds[1] === ds[2] || ds[0] === ds[2]) continue;
+  let ok = true;
+  for (const q of queries) {
+    let s = 0, b = 0;
+    for (let i = 0; i < 3; i++) {
+      if (ds[i] === q.num[i]) s++;
+      else if (q.num.includes(ds[i])) b++;
+    }
+    if (s !== q.s || b !== q.b) { ok = false; break; }
+  }
+  if (ok) count++;
+}
+console.log(count);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -1042,7 +1786,24 @@ K번 나라의 등수`,
       hints: [
         "가로: 각 행에서 연속된 '.' 구간의 길이가 2 이상인 것을 세세요",
         "세로: 각 열에서 같은 방식으로 세세요",
+        "'X'로 split하면 연속 '.' 그룹을 쉽게 구할 수 있어요",
+        "각 그룹의 길이가 2 이상이면 카운트++",
+        "가로: 행별로 split('X') 후 length>=2인 그룹 수, 세로: 열별로 동일 처리",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const grid = [];
+for (let i = 1; i <= N; i++) grid.push(lines[i]);
+let h = 0, v = 0;
+for (let i = 0; i < N; i++) {
+  grid[i].split('X').forEach(s => { if (s.length >= 2) h++; });
+}
+for (let j = 0; j < N; j++) {
+  let col = '';
+  for (let i = 0; i < N; i++) col += grid[i][j];
+  col.split('X').forEach(s => { if (s.length >= 2) v++; });
+}
+console.log(h + ' ' + v);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -1067,7 +1828,40 @@ N×N 배열
       hints: [
         "중앙(1)부터 시작해서 바깥으로 나가면서 채우세요",
         "또는 바깥부터 안으로 N²부터 1까지 채워도 됩니다",
+        "방향 순서: 오→아래→왼→위 (또는 반대) 를 반복",
+        "각 방향마다 이동 칸 수가 1,1,2,2,3,3... 패턴으로 증가",
+        "중앙에서 시작, 값=1, 오른쪽1 아래1 왼쪽2 위2 오른쪽3 아래3... 순으로 채워나감",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const target = Number(lines[1]);
+const grid = Array.from({length: N}, () => new Array(N).fill(0));
+let r = Math.floor(N/2), c = Math.floor(N/2);
+let val = 1;
+grid[r][c] = val++;
+const dr = [0, 1, 0, -1];
+const dc = [1, 0, -1, 0];
+let dir = 0, step = 1;
+while (val <= N * N) {
+  for (let t = 0; t < 2 && val <= N * N; t++) {
+    for (let s = 0; s < step && val <= N * N; s++) {
+      r += dr[dir]; c += dc[dir];
+      grid[r][c] = val++;
+    }
+    dir = (dir + 1) % 4;
+  }
+  step++;
+}
+let tr, tc;
+const result = [];
+for (let i = 0; i < N; i++) {
+  result.push(grid[i].join(' '));
+  for (let j = 0; j < N; j++) {
+    if (grid[i][j] === target) { tr = i + 1; tc = j + 1; }
+  }
+}
+console.log(result.join('\\n'));
+console.log(tr + ' ' + tc);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -1088,7 +1882,21 @@ N×N 배열
       hints: [
         "증가 수열 길이와 감소 수열 길이를 따로 추적하세요",
         "현재 값이 이전보다 크면 증가 길이+1, 아니면 리셋",
+        "같은 값이면 증가/감소 모두 1로 리셋",
+        "매 단계에서 max를 갱신하세요",
+        "inc=1, dec=1로 시작, arr[i]>arr[i-1]이면 inc++/dec=1, arr[i]<arr[i-1]이면 dec++/inc=1",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const arr = lines[1].split(' ').map(Number);
+let inc = 1, dec = 1, maxLen = 1;
+for (let i = 1; i < N; i++) {
+  if (arr[i] > arr[i-1]) { inc++; dec = 1; }
+  else if (arr[i] < arr[i-1]) { dec++; inc = 1; }
+  else { inc = 1; dec = 1; }
+  maxLen = Math.max(maxLen, inc, dec);
+}
+console.log(maxLen);`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
@@ -1109,7 +1917,20 @@ N×N 배열
       hints: [
         "3부분으로 나누는 모든 경우를 시도하세요 (2중 for문)",
         "각 부분을 뒤집고 이어붙인 결과 중 최솟값을 찾으세요",
+        "첫 번째 자르기 위치 i: 1~len-2, 두 번째 j: i+1~len-1",
+        "s.slice(0,i).reverse + s.slice(i,j).reverse + s.slice(j).reverse",
+        "모든 (i,j) 조합에서 결과를 구하고 사전순 최소값 출력",
       ],
+      solution: `const s = input;
+const rev = str => str.split('').reverse().join('');
+let best = null;
+for (let i = 1; i < s.length - 1; i++) {
+  for (let j = i + 1; j < s.length; j++) {
+    const result = rev(s.slice(0, i)) + rev(s.slice(i, j)) + rev(s.slice(j));
+    if (best === null || result < best) best = result;
+  }
+}
+console.log(best);`,
       starter: `const s = input;\n\n`,
     },
     {
@@ -1131,7 +1952,21 @@ N×N 배열
       hints: [
         "바구니의 왼쪽 끝과 오른쪽 끝을 추적하세요",
         "사과가 범위 밖이면 최소한만 이동시키세요",
+        "사과 위치가 left보다 작으면 왼쪽으로 이동, right보다 크면 오른쪽",
+        "이동량 = 범위를 벗어난 만큼만",
+        "if(pos<left) move=left-pos, left-=move, right-=move / if(pos>right) move=pos-right, left+=move, right+=move",
       ],
+      solution: `const lines = input.split('\\n');
+const [N, M] = lines[0].split(' ').map(Number);
+const J = Number(lines[1]);
+let left = 1, right = M;
+let total = 0;
+for (let i = 0; i < J; i++) {
+  const pos = Number(lines[2 + i]);
+  if (pos < left) { total += left - pos; right -= left - pos; left = pos; }
+  else if (pos > right) { total += pos - right; left += pos - right; right = pos; }
+}
+console.log(total);`,
       starter: `const lines = input.split('\\n');\nconst [N, M] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
@@ -1152,98 +1987,213 @@ N×N 배열
       hints: [
         "가로/세로 자르는 위치를 각각 모으세요",
         "0과 W(또는 H) 포함해서 정렬 후 인접 차이의 최대를 구하세요",
+        "가로줄(0)은 세로를 자르고, 세로줄(1)은 가로를 자릅니다",
+        "각 방향 자르기 위치에 0과 끝(W/H)을 추가 후 정렬",
+        "인접 차이 최대(가로) × 인접 차이 최대(세로) = 가장 큰 조각",
       ],
+      solution: `const lines = input.split('\\n');
+const [W, H] = lines[0].split(' ').map(Number);
+const N = Number(lines[1]);
+const hCuts = [0, H], vCuts = [0, W];
+for (let i = 0; i < N; i++) {
+  const [dir, pos] = lines[2 + i].split(' ').map(Number);
+  if (dir === 0) hCuts.push(pos);
+  else vCuts.push(pos);
+}
+hCuts.sort((a, b) => a - b);
+vCuts.sort((a, b) => a - b);
+let maxH = 0, maxV = 0;
+for (let i = 1; i < hCuts.length; i++) maxH = Math.max(maxH, hCuts[i] - hCuts[i-1]);
+for (let i = 1; i < vCuts.length; i++) maxV = Math.max(maxV, vCuts[i] - vCuts[i-1]);
+console.log(maxH * maxV);`,
       starter: `const lines = input.split('\\n');\nconst [W, H] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
-      id: 1783,
-      title: "병든 나이트",
-      description: `체스판이 N×M이다. 나이트는 (1,1)에서 출발하며 오른쪽으로만 이동 가능.
-이동 방법: (2칸 위,1칸 오른), (1칸 위,2칸 오른), (1칸 아래,2칸 오른), (2칸 아래,1칸 오른)
-방문할 수 있는 칸의 최대 개수를 구하시오.
+      id: 16922,
+      title: "로마 숫자 만들기",
+      description: `I=1, V=5, X=10, L=50.
+N개를 사용하여 만들 수 있는 서로 다른 수의 개수를 구하시오.
 
 【입력】
-N M (1 ≤ N, M ≤ 2×10⁹)
+N (1 ≤ N ≤ 20)
 
 【출력】
-최대 방문 칸 수`,
+서로 다른 수의 개수`,
       testCases: [
-        { input: "100 50", output: "48" },
-        { input: "2 4", output: "2" },
-        { input: "1 1", output: "1" },
+        { input: "1", output: "4" },
+        { input: "2", output: "10" },
       ],
       hints: [
-        "N이 1이면 1, N이 2이면 min(4, (M+1)/2)를 기준으로 생각하세요",
-        "N≥3이면 M에 따라 4가지 이동을 모두 쓸 수 있는지 판단",
+        "중복을 방지하려면 I→V→X→L 순서로만 사용하세요",
+        "I를 i개, V를 j개, X를 k개 쓰면 L은 N-i-j-k개",
+        "4중 for문으로 모든 조합을 탐색하세요",
+        "i+j+k <= N 조건에서 l = N-i-j-k",
+        "Set에 결과를 넣어 중복 제거 후 size 출력",
       ],
-      starter: `const [N, M] = input.split(' ').map(Number);\n\n`,
+      solution: `const N = Number(input);
+const s = new Set();
+for (let i = 0; i <= N; i++)
+  for (let j = 0; j <= N - i; j++)
+    for (let k = 0; k <= N - i - j; k++) {
+      const l = N - i - j - k;
+      s.add(i * 1 + j * 5 + k * 10 + l * 50);
+    }
+console.log(s.size);`,
+      starter: `const N = Number(input);\n\n`,
     },
     {
-      id: 1969,
-      title: "DNA",
-      description: `N개의 길이 M DNA 문자열이 주어진다.
-각 위치에서 가장 많이 등장하는 문자를 선택하여 Hamming Distance 합이 최소인 문자열을 구하시오.
-(같은 빈도면 사전순 앞선 것)
+      id: 3085,
+      title: "사탕 게임",
+      description: `N×N 보드에 사탕이 있다. 인접한 두 칸을 교환하여 같은 색 사탕이 연속하는 최대 길이를 구하시오.
 
 【입력】
-첫째 줄: N M
-다음 N줄: DNA 문자열
+첫째 줄: N (3 ≤ N ≤ 50)
+다음 N줄: 보드 (C,P,Z,Y)
 
 【출력】
-결과 문자열과 Hamming Distance 합`,
+먹을 수 있는 사탕의 최대 개수`,
       testCases: [
-        { input: "5 8\nTATGATAC\nTAGGATAC\nGATGATAA\nAATGATCC\nGATGATAC", output: "AATGATAC\n7" },
+        { input: "3\nCCP\nCCP\nPPC", output: "3" },
+        { input: "4\nPPPP\nCYZP\nCCPP\nYYCC", output: "4" },
       ],
       hints: [
-        "각 열마다 A,C,G,T 빈도를 세서 가장 많은 것을 선택하세요",
-        "같은 빈도면 A < C < G < T 사전순으로 선택",
+        "모든 인접한 두 칸을 교환해보고, 최대 연속 길이를 구하세요",
+        "교환 후 모든 행/열에서 연속된 같은 문자의 최대 길이를 체크",
+        "가로 인접과 세로 인접 모두 시도하세요",
+        "교환 → 체크 → 다시 원래대로 복구 → 반복",
+        "체크 함수: 모든 행/열을 순회하며 연속 같은 문자 최대 길이 반환",
       ],
-      starter: `const lines = input.split('\\n');\nconst [N, M] = lines[0].split(' ').map(Number);\n\n`,
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const board = [];
+for (let i = 1; i <= N; i++) board.push(lines[i].split(''));
+function check() {
+  let mx = 1;
+  for (let i = 0; i < N; i++) {
+    let cnt = 1;
+    for (let j = 1; j < N; j++) {
+      if (board[i][j] === board[i][j-1]) cnt++;
+      else cnt = 1;
+      mx = Math.max(mx, cnt);
+    }
+    cnt = 1;
+    for (let j = 1; j < N; j++) {
+      if (board[j][i] === board[j-1][i]) cnt++;
+      else cnt = 1;
+      mx = Math.max(mx, cnt);
+    }
+  }
+  return mx;
+}
+let ans = 1;
+for (let i = 0; i < N; i++) {
+  for (let j = 0; j < N; j++) {
+    if (j + 1 < N) {
+      [board[i][j], board[i][j+1]] = [board[i][j+1], board[i][j]];
+      ans = Math.max(ans, check());
+      [board[i][j], board[i][j+1]] = [board[i][j+1], board[i][j]];
+    }
+    if (i + 1 < N) {
+      [board[i][j], board[i+1][j]] = [board[i+1][j], board[i][j]];
+      ans = Math.max(ans, check());
+      [board[i][j], board[i+1][j]] = [board[i+1][j], board[i][j]];
+    }
+  }
+}
+console.log(ans);`,
+      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
-      id: 10709,
-      title: "기상캐스터",
-      description: `H×W 격자에서 'c'는 구름, '.'은 맑음. 구름은 매 분 오른쪽으로 1칸 이동.
-각 칸에 처음 구름이 오는 시간을 출력하시오 (오지 않으면 -1).
+      id: 13335,
+      title: "트럭",
+      description: `N대의 트럭이 길이 W, 최대하중 L인 다리를 건넌다.
+트럭은 순서대로 건너며, 다리 위 트럭 무게 합이 L 이하여야 한다.
+모든 트럭이 건너는 최소 시간을 구하시오.
 
 【입력】
-첫째 줄: H W
-다음 H줄: 격자
+N W L
+트럭 무게들
 
 【출력】
-각 칸의 시간`,
+최소 시간`,
       testCases: [
-        {
-          input: "3 4\nc...\n....\n.c..",
-          output: "0 1 2 3\n-1 -1 -1 -1\n-1 0 1 2",
-        },
+        { input: "4 2 10\n7 4 5 6", output: "8" },
+        { input: "1 100 100\n10", output: "101" },
+        { input: "10 100 100\n10 10 10 10 10 10 10 10 10 10", output: "110" },
       ],
       hints: [
-        "각 행별로 왼쪽에서 오른쪽으로 스캔하세요",
-        "'c'를 만나면 그 위치는 0, 이후 칸은 거리만큼 시간 증가",
+        "큐로 다리를 시뮬레이션하세요 (길이 W의 큐)",
+        "매 초마다: 큐에서 나가고, 새 트럭이 들어갈 수 있으면 넣기",
+        "큐에 0을 넣어서 빈 칸을 표현하면 편해요",
+        "큐 길이가 W이면 앞에서 하나 빼고, 새 트럭+현재 무게 <= L이면 push",
+        "매 초 time++, 큐가 비고 모든 트럭이 건너면 종료",
       ],
-      starter: `const lines = input.split('\\n');\nconst [H, W] = lines[0].split(' ').map(Number);\n\n`,
+      solution: `const lines = input.split('\\n');
+const [N, W, L] = lines[0].split(' ').map(Number);
+const trucks = lines[1].split(' ').map(Number);
+const bridge = new Array(W).fill(0);
+let time = 0, idx = 0, weight = 0;
+while (idx < N || weight > 0) {
+  time++;
+  weight -= bridge.shift();
+  if (idx < N && weight + trucks[idx] <= L) {
+    bridge.push(trucks[idx]);
+    weight += trucks[idx];
+    idx++;
+  } else {
+    bridge.push(0);
+  }
+}
+console.log(time);`,
+      starter: `const lines = input.split('\\n');\nconst [N, W, L] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
-      id: 8911,
-      title: "거북이",
-      description: `거북이가 명령에 따라 이동한다. F=전진, B=후진, L=좌회전, R=우회전.
-거북이가 지나간 영역의 최소 직사각형 넓이를 구하시오.
+      id: 18111,
+      title: "마인크래프트",
+      description: `N×M 땅의 높이가 주어진다. 모든 칸을 같은 높이로 만들 때 최소 시간을 구하시오.
+인벤토리에 B개의 블록. 블록 제거=2초, 블록 설치=1초.
+같은 시간이면 높이가 가장 높은 것 선택.
 
 【입력】
-테스트케이스 수 T
-각 케이스: 명령 문자열
+N M B
+다음 N줄: 높이 배열
 
 【출력】
-각 케이스의 넓이`,
+최소 시간과 높이`,
       testCases: [
-        { input: "2\nFFFFRFFFF\nLLLLRRRRFFFF", output: "16\n0" },
+        { input: "3 4 99\n0 0 0 0\n0 0 0 0\n0 0 0 1", output: "2 0" },
+        { input: "3 4 1\n64 64 64 64\n64 64 64 64\n64 64 64 63", output: "1 64" },
       ],
       hints: [
-        "방향에 따라 dx,dy를 설정하고 이동하며 x,y 최대/최소를 추적",
-        "넓이 = (maxX-minX) × (maxY-minY)",
+        "목표 높이를 0~256까지 모두 시도하세요 (완전탐색)",
+        "각 높이에서 필요한 시간과 블록 수를 계산",
+        "높이보다 높은 칸: 제거(2초×차이), 낮은 칸: 설치(1초×차이)",
+        "제거한 블록 + 인벤토리 >= 설치할 블록 이어야 가능",
+        "가능한 높이 중 시간 최소, 같은 시간이면 높이 최대 선택",
       ],
-      starter: `const lines = input.split('\\n');\nconst T = Number(lines[0]);\n\n`,
+      solution: `const lines = input.split('\\n');
+const [N, M, B] = lines[0].split(' ').map(Number);
+const heights = [];
+for (let i = 1; i <= N; i++) {
+  heights.push(...lines[i].split(' ').map(Number));
+}
+let bestTime = Infinity, bestH = 0;
+for (let h = 0; h <= 256; h++) {
+  let remove = 0, place = 0;
+  for (const v of heights) {
+    if (v > h) remove += v - h;
+    else place += h - v;
+  }
+  if (remove + B >= place) {
+    const time = remove * 2 + place;
+    if (time < bestTime || (time === bestTime && h > bestH)) {
+      bestTime = time;
+      bestH = h;
+    }
+  }
+}
+console.log(bestTime + ' ' + bestH);`,
+      starter: `const lines = input.split('\\n');\nconst [N, M, B] = lines[0].split(' ').map(Number);\n\n`,
     },
     {
       id: 2578,
@@ -1267,7 +2217,32 @@ N M (1 ≤ N, M ≤ 2×10⁹)
       hints: [
         "빙고판에서 불린 수의 위치를 찾아 표시하세요",
         "매번 가로5줄, 세로5줄, 대각선2줄 체크해서 완성된 줄 수를 세세요",
+        "marked[5][5] 배열로 지워진 위치를 관리",
+        "빙고 줄 수가 3 이상이면 그 순간의 번호를 출력",
+        "가로: 행별 합==5, 세로: 열별 합==5, 대각: (0,0)~(4,4)와 (0,4)~(4,0) 체크",
       ],
+      solution: `const lines = input.split('\\n');
+const board = [];
+for (let i = 0; i < 5; i++) board.push(lines[i].split(' ').map(Number));
+const calls = [];
+for (let i = 5; i < 10; i++) calls.push(...lines[i].split(' ').map(Number));
+const marked = Array.from({length: 5}, () => new Array(5).fill(false));
+const pos = {};
+for (let i = 0; i < 5; i++)
+  for (let j = 0; j < 5; j++)
+    pos[board[i][j]] = [i, j];
+for (let t = 0; t < 25; t++) {
+  const [r, c] = pos[calls[t]];
+  marked[r][c] = true;
+  let bingo = 0;
+  for (let i = 0; i < 5; i++) {
+    if (marked[i].every(v => v)) bingo++;
+    if (marked.every(row => row[i])) bingo++;
+  }
+  if ([0,1,2,3,4].every(i => marked[i][i])) bingo++;
+  if ([0,1,2,3,4].every(i => marked[i][4-i])) bingo++;
+  if (bingo >= 3) { console.log(t + 1); return; }
+}`,
       starter: `const lines = input.split('\\n');\n\n`,
     },
     {
@@ -1291,373 +2266,29 @@ N M (1 ≤ N, M ≤ 2×10⁹)
       hints: [
         "위치를 (열, 행) 숫자로 변환해서 처리하세요",
         "킹 이동 후 돌과 겹치면 돌도 같은 방향으로 이동. 범위 체크 주의",
+        "방향별 dx,dy를 매핑하세요 (R=+1,0 L=-1,0 T=0,+1 B=0,-1 등)",
+        "이동 후 범위(1~8) 체크: 킹 또는 돌이 벗어나면 이동 취소",
+        "킹과 돌이 겹치면 돌도 같은 방향으로 한 칸 이동, 돌이 범위 밖이면 전체 취소",
       ],
+      solution: `const lines = input.split('\\n');
+const [kingPos, stonePos, N] = lines[0].split(' ');
+let kc = kingPos.charCodeAt(0) - 64, kr = Number(kingPos[1]);
+let sc = stonePos.charCodeAt(0) - 64, sr = Number(stonePos[1]);
+const dir = { R:[1,0], L:[-1,0], B:[0,-1], T:[0,1], RT:[1,1], LT:[-1,1], RB:[1,-1], LB:[-1,-1] };
+for (let i = 1; i <= Number(N); i++) {
+  const [dc, dr] = dir[lines[i]];
+  const nkc = kc + dc, nkr = kr + dr;
+  if (nkc < 1 || nkc > 8 || nkr < 1 || nkr > 8) continue;
+  let nsc = sc, nsr = sr;
+  if (nkc === sc && nkr === sr) {
+    nsc = sc + dc; nsr = sr + dr;
+    if (nsc < 1 || nsc > 8 || nsr < 1 || nsr > 8) continue;
+  }
+  kc = nkc; kr = nkr; sc = nsc; sr = nsr;
+}
+console.log(String.fromCharCode(64 + kc) + kr);
+console.log(String.fromCharCode(64 + sc) + sr);`,
       starter: `const lines = input.split('\\n');\nconst [kingPos, stonePos, N] = lines[0].split(' ');\n\n`,
-    },
-    {
-      id: 10431,
-      title: "줄세우기",
-      description: `학생 20명이 차례로 줄을 선다. 새 학생이 오면 자기보다 큰 학생 앞에 선다.
-이때 뒤로 밀려나는 총 횟수를 구하시오.
-
-【입력】
-테스트케이스 수 T
-각 줄: 케이스번호 + 20명의 키
-
-【출력】
-각 케이스: 케이스번호 뒤로 밀려난 총 횟수`,
-      testCases: [
-        {
-          input: "1\n1 900 901 902 903 904 905 906 907 908 909 910 911 912 913 914 915 916 917 918 919",
-          output: "1 0",
-        },
-      ],
-      hints: [
-        "삽입 정렬과 같은 원리입니다",
-        "새 학생보다 키가 큰 학생 수 = 밀려나는 횟수",
-      ],
-      starter: `const lines = input.split('\\n');\nconst T = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 2659,
-      title: "십자카드 문제",
-      description: `십자 모양 카드에 4개의 숫자(0~9)가 적혀있다.
-시계방향으로 읽어 4자리 수를 만들 수 있다 (4가지 회전).
-그 중 최솟값보다 작은 4자리 수 중 십자카드로 만들 수 없는 수의 개수를 구하시오.
-
-【입력】
-4개의 숫자 (위, 오른, 아래, 왼)
-
-【출력】
-최솟값보다 작은 불가능한 수의 개수`,
-      testCases: [
-        { input: "1 2 3 4", output: "3" },
-        { input: "0 0 0 0", output: "0" },
-      ],
-      hints: [
-        "4회전의 최솟값을 먼저 구하세요",
-        "1111부터 최솟값-1까지 각 수가 어떤 십자카드로 가능한지 확인",
-      ],
-      starter: `const nums = input.split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 3085,
-      title: "사탕 게임",
-      description: `N×N 보드에 사탕이 있다. 인접한 두 칸을 교환하여 같은 색 사탕이 연속하는 최대 길이를 구하시오.
-
-【입력】
-첫째 줄: N (3 ≤ N ≤ 50)
-다음 N줄: 보드 (C,P,Z,Y)
-
-【출력】
-먹을 수 있는 사탕의 최대 개수`,
-      testCases: [
-        { input: "3\nCCP\nCCP\nPPC", output: "3" },
-        { input: "4\nPPPP\nCYZP\nCCPP\nYYCC", output: "4" },
-      ],
-      hints: [
-        "모든 인접한 두 칸을 교환해보고, 최대 연속 길이를 구하세요",
-        "교환 후 모든 행/열에서 연속된 같은 문자의 최대 길이를 체크",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 2477,
-      title: "참외밭",
-      description: `ㄱ자 모양 밭에 참외가 심어져 있다. 1m²당 K개.
-6개의 변 정보(방향, 길이)로 밭의 넓이를 구하시오.
-
-방향: 1=동, 2=서, 3=남, 4=북
-
-【입력】
-K
-6줄: 방향 길이
-
-【출력】
-참외 수 (넓이 × K)`,
-      testCases: [
-        { input: "7\n4 50\n1 160\n3 30\n1 60\n3 20\n2 220", output: "47600" },
-      ],
-      hints: [
-        "ㄱ자 = 큰 직사각형 - 작은 직사각형",
-        "가장 긴 가로변과 가장 긴 세로변이 큰 직사각형의 변",
-      ],
-      starter: `const lines = input.split('\\n');\nconst K = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 13335,
-      title: "트럭",
-      description: `N대의 트럭이 길이 W, 최대하중 L인 다리를 건넌다.
-트럭은 순서대로 건너며, 다리 위 트럭 무게 합이 L 이하여야 한다.
-모든 트럭이 건너는 최소 시간을 구하시오.
-
-【입력】
-N W L
-트럭 무게들
-
-【출력】
-최소 시간`,
-      testCases: [
-        { input: "4 2 10\n7 4 5 6", output: "8" },
-        { input: "1 100 100\n10", output: "101" },
-        { input: "10 100 100\n10 10 10 10 10 10 10 10 10 10", output: "110" },
-      ],
-      hints: [
-        "큐로 다리를 시뮬레이션하세요 (길이 W의 큐)",
-        "매 초마다: 큐에서 나가고, 새 트럭이 들어갈 수 있으면 넣기",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [N, W, L] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 2304,
-      title: "창고 다각형",
-      description: `기둥들의 위치와 높이가 주어진다. 지붕은 기둥 꼭대기를 연결하되, 오르막은 왼쪽에서 올라가고 내리막은 오른쪽에서 내려간다. 지붕의 면적을 구하시오.
-
-【입력】
-기둥 수 N
-다음 N줄: 위치 높이
-
-【출력】
-면적`,
-      testCases: [
-        { input: "7\n2 4\n11 4\n15 8\n4 6\n5 3\n8 10\n13 6", output: "98" },
-      ],
-      hints: [
-        "가장 높은 기둥을 기준으로 왼쪽/오른쪽을 나눠서 처리하세요",
-        "왼쪽: 왼쪽에서 오른쪽으로 최대 높이 갱신하며 면적 누적",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 1205,
-      title: "등수 구하기",
-      description: `N명의 점수와 새 점수가 주어진다. 랭킹리스트 최대 P명.
-새 점수의 등수를 구하시오. 점수가 같으면 같은 등수.
-리스트가 꽉 차고 마지막과 같은 점수면 등록 불가(-1).
-
-【입력】
-N P (현재 인원, 최대 인원)
-현재 점수들 (없으면 빈 줄)
-새 점수
-
-【출력】
-등수 또는 -1`,
-      testCases: [
-        { input: "3 5\n100 90 80\n100", output: "1" },
-        { input: "3 3\n100 90 80\n80", output: "-1" },
-        { input: "0 10\n\n1000", output: "1" },
-      ],
-      hints: [
-        "정렬된 점수에서 새 점수보다 큰 것의 수 + 1이 등수",
-        "N이 P이고 새 점수가 마지막과 같거나 작으면 -1",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [N, P] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 2331,
-      title: "반복수열",
-      description: `A부터 시작하여 각 자릿수의 P제곱의 합으로 다음 수를 만든다.
-반복되는 부분이 나타나면, 반복 순환에 포함되지 않는 수의 개수를 출력.
-
-【입력】
-A P
-
-【출력】
-반복 전 수의 개수`,
-      testCases: [
-        { input: "57 2", output: "2" },
-        { input: "1 5", output: "0" },
-      ],
-      hints: [
-        "수열을 만들며 배열에 저장하세요",
-        "이미 나온 수가 다시 나오면, 그 수의 첫 등장 인덱스가 답",
-      ],
-      starter: `const [A, P] = input.split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 30804,
-      title: "과일 탕후루",
-      description: `N개의 과일이 꼬치에 꽂혀있다. 앞/뒤에서만 빼서 과일 종류를 2가지 이하로 만들 때,
-남길 수 있는 최대 과일 수를 구하시오.
-
-【입력】
-N
-과일 종류 배열
-
-【출력】
-최대 과일 수`,
-      testCases: [
-        { input: "5\n1 2 3 2 1", output: "3" },
-        { input: "8\n1 2 1 2 1 2 1 2", output: "8" },
-      ],
-      hints: [
-        "투 포인터(슬라이딩 윈도우)를 사용하세요",
-        "구간 내 과일 종류가 2 이하인 최대 길이를 구하세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 1713,
-      title: "후보 추천하기",
-      description: `비어있는 N개 사진틀에 추천 받은 학생 사진을 건다.
-틀이 꽉 차면 추천수 가장 적은 학생을 내린다 (동률시 가장 오래된 학생).
-최종 사진틀의 학생 번호를 오름차순 출력.
-
-【입력】
-N (사진틀 수)
-추천 횟수
-추천 학생 번호들
-
-【출력】
-최종 사진틀 학생 번호 (오름차순)`,
-      testCases: [
-        { input: "3\n9\n2 1 4 3 5 6 2 7 2", output: "2 6 7" },
-      ],
-      hints: [
-        "각 학생의 추천수와 게시 시간을 관리하세요",
-        "이미 있으면 추천수+1, 없으면 최소 추천수 학생 교체",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 18111,
-      title: "마인크래프트",
-      description: `N×M 땅의 높이가 주어진다. 모든 칸을 같은 높이로 만들 때 최소 시간을 구하시오.
-인벤토리에 B개의 블록. 블록 제거=2초, 블록 설치=1초.
-같은 시간이면 높이가 가장 높은 것 선택.
-
-【입력】
-N M B
-다음 N줄: 높이 배열
-
-【출력】
-최소 시간과 높이`,
-      testCases: [
-        { input: "3 4 99\n0 0 0 0\n0 0 0 0\n0 0 0 1", output: "2 0" },
-        { input: "3 4 1\n64 64 64 64\n64 64 64 64\n64 64 64 63", output: "1 64" },
-      ],
-      hints: [
-        "목표 높이를 0~256까지 모두 시도하세요 (완전탐색)",
-        "각 높이에서 필요한 시간과 블록 수를 계산",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [N, M, B] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 16918,
-      title: "봄버맨",
-      description: `R×C 격자에 폭탄이 놓여있다. 봄버맨의 행동:
-0초: 초기 상태
-1초: 아무것도 안 함
-2초: 빈 칸에 폭탄 설치
-3초: 3초 전 폭탄 폭발 (상하좌우 포함)
-이후 2,3을 반복. N초 후 상태를 출력.
-
-【입력】
-R C N
-격자 (.=빈칸, O=폭탄)
-
-【출력】
-N초 후 상태`,
-      testCases: [
-        {
-          input: "6 7 3\n.......\n...O...\n....O..\n.......\n.......\nOO.....",
-          output: "OOO.OOO\nOO...OO\nOOO...O\n..OO.OO\nOO.OOOO\nOO.OO..",
-        },
-      ],
-      hints: [
-        "폭탄 설치 시간을 기록하세요",
-        "N이 1이면 초기상태, 짝수면 전부 폭탄, 홀수면 패턴 반복",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [R, C, N] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 2564,
-      title: "경비원",
-      description: `직사각형 블록 가장자리에 상점들과 동근이 집이 있다.
-동근이가 블록 가장자리를 따라 각 상점까지의 최단 거리 합을 구하시오.
-
-【입력】
-가로 세로
-상점 수
-각 상점: 방향 거리
-동근이 집: 방향 거리
-
-【출력】
-최단 거리 합`,
-      testCases: [
-        { input: "10 5\n3\n1 4\n3 2\n2 8\n2 3", output: "14" },
-      ],
-      hints: [
-        "둘레를 따라 시계/반시계 두 방향 중 짧은 쪽을 선택",
-        "각 위치를 둘레 위의 1차원 좌표로 변환하세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [W, H] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 13414,
-      title: "수강신청",
-      description: `K과목, L번의 클릭 기록이 주어진다.
-같은 학생이 여러 번 클릭하면 마지막 클릭만 유효.
-선착순 K명을 출력.
-
-【입력】
-K L
-다음 L줄: 학번
-
-【출력】
-수강 성공 학생 (최대 K명)`,
-      testCases: [
-        { input: "3 5\n1\n2\n3\n2\n4", output: "1\n3\n2" },
-      ],
-      hints: [
-        "중복 클릭을 제거하되 마지막 클릭 순서를 유지해야 합니다",
-        "Map이나 Set을 활용하세요. 기존 기록 삭제 후 재삽입",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [K, L] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 2567,
-      title: "색종이 - 2",
-      description: `100×100 도화지에 10×10 색종이를 여러 장 붙인다.
-색종이 둘레의 총 길이를 구하시오.
-
-【입력】
-색종이 수 N
-다음 N줄: x y
-
-【출력】
-둘레 길이`,
-      testCases: [
-        { input: "4\n3 7\n5 2\n15 7\n13 14", output: "96" },
-      ],
-      hints: [
-        "100×100 배열에 색종이 영역을 채운 후",
-        "각 칸의 4변을 확인해서 바깥(또는 빈칸)과 접하면 둘레+1",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 17266,
-      title: "어두운 굴다리",
-      description: `0부터 N까지의 굴다리에 M개의 가로등이 있다.
-모든 지점을 밝히려면 가로등 높이(= 밝히는 반경)의 최솟값을 구하시오.
-
-【입력】
-N
-M
-가로등 위치들
-
-【출력】
-최소 높이`,
-      testCases: [
-        { input: "5\n2\n2 4", output: "2" },
-        { input: "10\n3\n3 5 7", output: "3" },
-      ],
-      hints: [
-        "이분 탐색으로 높이를 정하고, 모든 구간을 커버하는지 확인",
-        "또는 인접 가로등 사이 거리와 양 끝 거리로 직접 계산",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
     },
     {
       id: 16173,
@@ -1678,364 +2309,25 @@ N×N 격자
       hints: [
         "BFS나 DFS로 (0,0)에서 시작해서 도달 가능한지 탐색",
         "오른쪽(+jump,0)과 아래(0,+jump)만 시도하세요",
+        "방문 배열로 중복 방문을 방지하세요",
+        "grid[r][c]가 -1이면 도착점이므로 성공",
+        "큐에 (0,0) 넣고, 각 칸에서 jump만큼 오른쪽/아래 이동 시도",
       ],
+      solution: `const lines = input.split('\\n');
+const N = Number(lines[0]);
+const grid = [];
+for (let i = 1; i <= N; i++) grid.push(lines[i].split(' ').map(Number));
+const visited = Array.from({length: N}, () => new Array(N).fill(false));
+const queue = [[0, 0]];
+visited[0][0] = true;
+while (queue.length > 0) {
+  const [r, c] = queue.shift();
+  if (grid[r][c] === -1) { console.log('HaruHaru'); return; }
+  const jump = grid[r][c];
+  if (r + jump < N && !visited[r + jump][c]) { visited[r + jump][c] = true; queue.push([r + jump, c]); }
+  if (c + jump < N && !visited[r][c + jump]) { visited[r][c + jump] = true; queue.push([r, c + jump]); }
+}
+console.log('Hing');`,
       starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 2002,
-      title: "추월",
-      description: `터널에 들어간 순서와 나온 순서가 주어진다.
-터널 안에서 추월한 차의 대수를 구하시오.
-
-【입력】
-N
-N줄: 들어간 순서
-N줄: 나온 순서
-
-【출력】
-추월한 차 수`,
-      testCases: [
-        {
-          input: "4\nZG431SN\nZG5765M\nZG9ABA\nZG2345B\nZG2345B\nZG431SN\nZG9ABA\nZG5765M",
-          output: "2",
-        },
-      ],
-      hints: [
-        "나온 순서에서, 들어간 순서 기준으로 앞선 차보다 먼저 나왔으면 추월",
-        "들어간 순서를 인덱스로 변환해서 비교하세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 2852,
-      title: "NBA 농구",
-      description: `NBA 농구 경기에서 팀1과 팀2가 득점한 시간이 주어진다.
-각 팀이 이기고 있던 총 시간을 구하시오.
-
-【입력】
-N (득점 수)
-N줄: 팀번호 시간(MM:SS)
-
-【출력】
-팀1 리드 시간
-팀2 리드 시간 (MM:SS 형식)`,
-      testCases: [
-        {
-          input: "4\n1 01:10\n2 21:10\n2 31:30\n1 41:40",
-          output: "20:00\n10:30",
-        },
-      ],
-      hints: [
-        "시간을 초 단위로 변환해서 계산하세요",
-        "각 득점 시점마다 이전 상태(리드 팀)에 따라 시간을 누적",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 16922,
-      title: "로마 숫자 만들기",
-      description: `I=1, V=5, X=10, L=50.
-N개를 사용하여 만들 수 있는 서로 다른 수의 개수를 구하시오.
-
-【입력】
-N (1 ≤ N ≤ 20)
-
-【출력】
-서로 다른 수의 개수`,
-      testCases: [
-        { input: "1", output: "4" },
-        { input: "2", output: "10" },
-      ],
-      hints: [
-        "중복을 방지하려면 I→V→X→L 순서로만 사용하세요",
-        "I를 i개, V를 j개, X를 k개 쓰면 L은 N-i-j-k개",
-      ],
-      starter: `const N = Number(input);\n\n`,
-    },
-    {
-      id: 17952,
-      title: "과제는 끝나지 않아!",
-      description: `N분 동안 매 분마다 새 과제가 나올 수 있다.
-새 과제가 나오면 현재 하던 것을 보류하고 새 과제부터.
-과제 완료시 점수 획득. 보류된 과제는 가장 최근 것부터 이어서.
-
-【입력】
-N
-N줄: 1 점수 시간 (새 과제) 또는 0 (과제 없음)
-
-【출력】
-획득 총점`,
-      testCases: [
-        { input: "6\n1 40 3\n0\n0\n1 100 2\n0\n0", output: "140" },
-      ],
-      hints: [
-        "스택으로 보류 과제를 관리하세요",
-        "새 과제가 오면 push, 현재 과제 완료하면 pop",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 1283,
-      title: "단축키 지정",
-      description: `N개의 옵션에 단축키를 지정한다.
-1. 각 단어의 첫 글자 중 아직 지정 안 된 것 선택
-2. 없으면 왼쪽부터 하나씩 보며 지정 안 된 것 선택
-3. 그래도 없으면 단축키 없음
-단축키 글자는 [X]로 표시.
-
-【입력】
-N
-N줄: 옵션 이름
-
-【출력】
-단축키 표시된 옵션`,
-      testCases: [
-        {
-          input: "5\nNew\nOpen\nSave\nSave As\nSave All",
-          output: "[N]ew\n[O]pen\n[S]ave\nSave [A]s\nSa[v]e All",
-        },
-      ],
-      hints: [
-        "각 단어의 첫 글자를 우선 체크하세요 (대소문자 무시)",
-        "이미 사용된 문자는 Set으로 관리",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 20006,
-      title: "랭킹전 대기열",
-      description: `N명의 플레이어가 방에 배정된다. 방 크기 m.
-레이팅 차이 10 이내면 같은 방. 방이 꽉 차면 게임 시작.
-방에 못 들어가면 새 방.
-
-【입력】
-N m (총 인원, 방 크기)
-N줄: 레이팅 닉네임
-
-【출력】
-각 방의 상태 (닉네임 사전순, 시작/대기 표시)`,
-      testCases: [
-        {
-          input: "10 5\n1500 Faker\n1500 Teddy\n1500 CloZer\n1500 Bdd\n1500 Kiin\n1500 Deft\n1490 Gumayusi\n1400 Kellin\n1505 Showmaker\n1510 Chovy",
-          output: "Bdd\nCloZer\nFaker\nKiin\nTeddy\nStarted!\nChovy\nDeft\nGumayusi\nShowmaker\nWaiting!\nKellin\nWaiting!",
-        },
-      ],
-      hints: [
-        "첫 입장자의 레이팅 기준으로 ±10 이내만 같은 방",
-        "방이 m명이면 Started!, 아니면 Waiting!",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [N, m] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 19583,
-      title: "싸이버개강총회",
-      description: `개강총회 시작(S), 끝(E), 스트리밍끝(Q) 시간이 주어진다.
-S 이전에 입장 AND E~Q 사이에 퇴장한 사람 수를 구하시오.
-
-【입력】
-S E Q (HH:MM 형식)
-다음 줄들: 시간 닉네임
-
-【출력】
-출석 인정 인원 수`,
-      testCases: [
-        {
-          input: "22:00 23:00 23:30\n21:30 malkoring\n22:00 malkoring\n23:10 malkoring\n21:00 person1\n22:00 person1\n23:00 person2\n23:15 person2",
-          output: "2",
-        },
-      ],
-      hints: [
-        "입장: S 이전(포함) 첫 기록, 퇴장: E~Q 사이(포함) 기록",
-        "Map으로 각 사람의 입장/퇴장을 추적하세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [S, E, Q] = lines[0].split(' ');\n\n`,
-    },
-    {
-      id: 1817,
-      title: "짐 챙기는 숌",
-      description: `무게 제한 C인 가방에 N개의 짐을 넣는다.
-짐은 주어진 순서대로 넣되, 현재 가방에 안 들어가면 새 가방.
-필요한 가방의 최소 수를 구하시오.
-
-【입력】
-C (가방 무게 제한, ≤ 10000)
-N (짐 수, ≤ 1000, 0이면 가방 0개)
-다음 줄들: 각 짐의 무게
-
-【출력】
-필요한 가방 수`,
-      testCases: [
-        { input: "6\n8\n1\n4\n2\n5\n6\n1\n3\n2", output: "4" },
-        { input: "10\n0", output: "0" },
-      ],
-      hints: [
-        "순서대로 넣되, 현재 가방에 안 들어가면 새 가방 열기",
-        "각 가방의 남은 용량을 추적하세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst C = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 1331,
-      title: "나이트 투어",
-      description: `8×8 체스판에서 나이트가 모든 칸을 정확히 한 번 방문하는지 확인하시오.
-
-【입력】
-36개의 좌표 (A1~F6 형식, 6×6 보드)
-
-【출력】
-Valid 또는 Invalid`,
-      testCases: [
-        {
-          input: "A1\nB3\nA5\nC6\nE5\nF3\nD2\nF1\nE3\nF5\nD6\nB5\nA3\nB1\nD4\nC2\nA4\nB6\nD5\nF6\nE4\nC3\nA2\nB4\nC6\nD4\nE6\nF4\nD3\nE1\nC2\nA1\nB3\nC1\nE2\nF4",
-          output: "Invalid",
-        },
-      ],
-      hints: [
-        "나이트의 이동이 유효한지 (가로2세로1 또는 가로1세로2) 매번 확인",
-        "모든 36칸을 방문하고, 마지막에서 첫 칸으로 돌아올 수 있는지도 확인",
-      ],
-      starter: `const lines = input.split('\\n');\n\n`,
-    },
-    {
-      id: 3613,
-      title: "Java vs C++",
-      description: `변수명이 Java 스타일(camelCase)인지 C++ 스타일(snake_case)인지 판별하고 변환하시오.
-Java → C++로, C++ → Java로.
-둘 다 해당되거나 둘 다 아니면 "Error!"
-
-【입력】
-변수명
-
-【출력】
-변환 결과 또는 Error!`,
-      testCases: [
-        { input: "long_variable_name", output: "longVariableName" },
-        { input: "longVariableName", output: "long_variable_name" },
-        { input: "aName_inBoth", output: "Error!" },
-        { input: "_bad", output: "Error!" },
-        { input: "a", output: "a" },
-      ],
-      hints: [
-        "Java: 소문자시작, _없음, 대문자 포함 가능",
-        "C++: 소문자와 _ 만, 연속 _ 불가, 시작/끝 _ 불가, 대문자 없음",
-      ],
-      starter: `const s = input;\n\n`,
-    },
-    {
-      id: 3758,
-      title: "KCPC",
-      description: `프로그래밍 대회 순위를 매긴다.
-순위 기준: 1.총점 내림 → 2.풀이수 내림 → 3.마지막 제출 시간 오름 → 4.팀번호 오름
-각 팀의 마지막 제출만 점수로 인정. 특정 팀의 순위를 구하시오.
-
-【입력】
-T (테스트케이스 수)
-각 케이스 첫 줄: n k p q (팀수, 문제수, 우리팀번호, 제출수)
-다음 q줄: 팀번호 문제번호 점수
-
-【출력】
-각 케이스: 우리 팀 순위`,
-      testCases: [
-        {
-          input: "1\n3 4 1 10\n1 1 30\n2 1 50\n1 2 40\n2 2 30\n1 3 50\n2 3 40\n3 1 100\n3 2 100\n1 1 20\n2 2 0",
-          output: "2",
-        },
-      ],
-      hints: [
-        "각 팀별, 각 문제별 마지막 점수를 저장하세요",
-        "정렬 조건을 순서대로 적용하세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst T = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 1308,
-      title: "D-Day",
-      description: `두 날짜 사이의 일수 차이를 구하시오.
-윤년 규칙: 4의 배수이면 윤년, 100의 배수이면 평년, 400의 배수이면 윤년.
-날짜 차이가 1000일 넘으면 "gg".
-
-【입력】
-두 줄: Y M D 형식
-
-【출력】
-"D-일수" 또는 "gg"`,
-      testCases: [
-        { input: "2012 9 16\n2012 9 23", output: "D-7" },
-        { input: "2012 1 1\n2012 12 31", output: "D-365" },
-      ],
-      hints: [
-        "두 날짜를 일수로 변환하여 차이를 구하세요",
-        "JS Date 객체를 활용하면 편합니다",
-      ],
-      starter: `const lines = input.split('\\n');\n\n`,
-    },
-    {
-      id: 10157,
-      title: "자리배정",
-      description: `C×R 공연장에서 달팽이 순서로 좌석을 배정한다.
-좌하단(1,1)에서 위쪽으로 시작하여 반시계 방향.
-K번째 좌석의 좌표를 구하시오.
-
-【입력】
-C R
-K
-
-【출력】
-좌석 좌표 (열 행) 또는 0`,
-      testCases: [
-        { input: "7 6\n12", output: "2 3" },
-        { input: "7 6\n100", output: "0" },
-      ],
-      hints: [
-        "달팽이 이동: 위→오른→아래→왼 방향으로 반복",
-        "이동하며 카운트하다가 K번째에서 멈추세요",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [C, R] = lines[0].split(' ').map(Number);\n\n`,
-    },
-    {
-      id: 2607,
-      title: "비슷한 단어",
-      description: `첫 번째 단어와 비슷한 단어 수를 구하시오.
-비슷한 단어: 문자 하나를 추가/삭제/교체하면 같아지는 단어.
-(구성 문자의 차이가 0~1인 경우)
-
-【입력】
-N
-N줄: 단어들
-
-【출력】
-첫 번째 단어와 비슷한 단어 수 (첫 번째 제외)`,
-      testCases: [
-        { input: "4\nDOG\nDOT\nDO\nDOG", output: "2" },
-      ],
-      hints: [
-        "각 알파벳의 빈도를 세서 비교하세요",
-        "길이 차이가 2 이상이면 비슷할 수 없습니다",
-      ],
-      starter: `const lines = input.split('\\n');\nconst N = Number(lines[0]);\n\n`,
-    },
-    {
-      id: 5212,
-      title: "지구 온난화",
-      description: `R×C 지도에서 상하좌우 중 3면 이상이 바다(.)인 땅(X)은 잠긴다.
-50년 후 지도를 출력하시오. 불필요한 빈 행/열은 제거.
-
-【입력】
-R C
-R줄: 지도
-
-【출력】
-50년 후 지도`,
-      testCases: [
-        {
-          input: "3 3\n...\n.X.\n...",
-          output: "...\n...\n...",
-        },
-      ],
-      hints: [
-        "각 X칸에 대해 상하좌우 바다 수를 세세요",
-        "3면 이상 바다이면 . 로 변환. 원본을 보고 새 배열에 기록",
-      ],
-      starter: `const lines = input.split('\\n');\nconst [R, C] = lines[0].split(' ').map(Number);\n\n`,
     },
 ];
