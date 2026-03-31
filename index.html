@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>코테 알람</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==================== 메인 화면: 알람 목록 ==================== -->
+  <div id="screen-main" class="screen active">
+    <div class="header">
+      <h1>&#128187; 코테 알람</h1>
+      <div class="header-actions">
+        <button class="btn-icon" onclick="quickTest()" title="즉시 테스트">&#9654;</button>
+        <button class="btn-icon" onclick="openAddAlarm()" title="알람 추가">&#43;</button>
+      </div>
+    </div>
+    <div id="alarm-list" class="alarm-list"></div>
+  </div>
+
+  <!-- ==================== 알람 추가 화면 ==================== -->
+  <div id="screen-add" class="screen">
+    <div class="screen-header">
+      <button class="btn-text" onclick="showScreen('main')">취소</button>
+      <h2>알람 추가</h2>
+      <button class="btn-text" onclick="saveAlarm()">저장</button>
+    </div>
+
+    <!-- 시간 선택 -->
+    <div class="time-picker">
+      <input type="number" id="inp-hour" min="0" max="23" value="07" placeholder="07">
+      <span class="colon">:</span>
+      <input type="number" id="inp-minute" min="0" max="59" value="00" placeholder="00">
+    </div>
+
+    <!-- 반복 요일 -->
+    <div class="form-section">
+      <label>반복</label>
+      <div class="day-selector">
+        <button class="day-btn" data-day="0" onclick="toggleDay(this)">일</button>
+        <button class="day-btn" data-day="1" onclick="toggleDay(this)">월</button>
+        <button class="day-btn" data-day="2" onclick="toggleDay(this)">화</button>
+        <button class="day-btn" data-day="3" onclick="toggleDay(this)">수</button>
+        <button class="day-btn" data-day="4" onclick="toggleDay(this)">목</button>
+        <button class="day-btn" data-day="5" onclick="toggleDay(this)">금</button>
+        <button class="day-btn" data-day="6" onclick="toggleDay(this)">토</button>
+      </div>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickSelectDays('weekday')">평일</button>
+        <button class="quick-btn" onclick="quickSelectDays('weekend')">주말</button>
+        <button class="quick-btn" onclick="quickSelectDays('everyday')">매일</button>
+        <button class="quick-btn" onclick="quickSelectDays('none')">초기화</button>
+      </div>
+    </div>
+
+    <!-- 라벨 -->
+    <div class="form-section">
+      <label>라벨</label>
+      <input type="text" class="form-input" id="inp-label" value="코테 알람" placeholder="알람 이름">
+    </div>
+
+    <button class="btn-save" onclick="saveAlarm()">저장</button>
+  </div>
+
+  <!-- ==================== 문제 풀기 화면 ==================== -->
+  <div id="screen-problem" class="screen">
+    <!-- 상단 바 -->
+    <div class="problem-header">
+      <span class="badge" id="problem-id">BOJ</span>
+      <span class="timer" id="timer">00:00</span>
+    </div>
+
+    <!-- 탭 -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="problem-tab" onclick="switchTab('problem-tab')">&#128196; 문제</button>
+      <button class="tab-btn" data-tab="code-tab" onclick="switchTab('code-tab')">&#128187; 코드</button>
+    </div>
+
+    <!-- 문제 탭 -->
+    <div id="problem-tab" class="tab-content active" style="overflow-y:auto;flex:1">
+      <h2 class="problem-title" id="problem-title"></h2>
+      <div class="problem-desc" id="problem-desc"></div>
+      <div id="examples"></div>
+      <div id="hint-area" style="display:none"></div>
+    </div>
+
+    <!-- 코드 탭 -->
+    <div id="code-tab" class="tab-content" style="flex:1">
+      <div class="code-editor" style="flex:1;display:flex;flex-direction:column">
+        <textarea class="code-textarea" id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        <div class="results" id="results" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- 하단 바 -->
+    <div class="bottom-bar">
+      <button class="btn-hint" onclick="revealHint()">&#128161; 힌트</button>
+      <button class="btn-submit" onclick="submitCode()">&#9654; 제출</button>
+    </div>
+  </div>
+
+  <!-- ==================== 알람 울리는 화면 (오버레이) ==================== -->
+  <div class="ringing-overlay">
+    <div class="ringing-icon">&#9200;</div>
+    <div class="ringing-time" id="ringing-time">오전 7:00</div>
+    <div class="ringing-label" id="ringing-label">코테 알람</div>
+    <button class="btn-solve" onclick="startSolving()">문제 풀고 알람 끄기</button>
+  </div>
+
+  <!-- ==================== 정답 화면 ==================== -->
+  <div class="solved-screen">
+    <div class="solved-icon">&#127881;</div>
+    <div class="solved-title">정답입니다!</div>
+    <div class="solved-stats">
+      문제: <span id="solved-problem"></span><br>
+      풀이 시간: <span id="solved-time"></span>
+    </div>
+    <button class="btn-dismiss" onclick="dismissAlarm()">알람 끄기</button>
+  </div>
+
+  <script src="problems.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
