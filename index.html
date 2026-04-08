@@ -16,11 +16,54 @@
     <div class="header">
       <h1>&#128187; 코테 알람</h1>
       <div class="header-actions">
+        <button class="btn-icon" onclick="openProblemSelect()" title="문제 선택">&#128218;</button>
         <button class="btn-icon" onclick="quickTest()" title="즉시 테스트">&#9654;</button>
         <button class="btn-icon" onclick="openAddAlarm()" title="알람 추가">&#43;</button>
       </div>
     </div>
     <div id="alarm-list" class="alarm-list"></div>
+  </div>
+
+  <!-- ==================== 문제 선택 화면 ==================== -->
+  <div id="screen-select" class="screen">
+    <div class="screen-header">
+      <button class="btn-text" onclick="showScreen('main')">뒤로</button>
+      <h2>문제 선택</h2>
+      <div style="width:60px"></div>
+    </div>
+
+    <!-- 카테고리 탭 -->
+    <div class="category-tabs">
+      <button class="cat-tab active" data-cat="all" onclick="selectCategory('all', this)">
+        전체 <span class="cat-count" id="count-all"></span>
+      </button>
+      <button class="cat-tab" data-cat="algorithm" onclick="selectCategory('algorithm', this)">
+        알고리즘 <span class="cat-count" id="count-algorithm"></span>
+      </button>
+      <button class="cat-tab" data-cat="practical" onclick="selectCategory('practical', this)">
+        실무 <span class="cat-count" id="count-practical"></span>
+      </button>
+      <button class="cat-tab" data-cat="toss" onclick="selectCategory('toss', this)">
+        토스 <span class="cat-count" id="count-toss"></span>
+      </button>
+      <button class="cat-tab" data-cat="async" onclick="selectCategory('async', this)">
+        비동기 <span class="cat-count" id="count-async"></span>
+      </button>
+    </div>
+
+    <!-- 진행 상황 바 -->
+    <div class="progress-bar-container">
+      <div class="progress-info">
+        <span id="progress-text">0 / 0 풀이 완료</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- 문제 리스트 -->
+    <div id="problem-list" class="problem-list"></div>
   </div>
 
   <!-- ==================== 알람 추가 화면 ==================== -->
@@ -126,6 +169,7 @@
   </div>
 
   <script src="problems.js"></script>
+  <script src="challenges.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

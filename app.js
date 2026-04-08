@@ -10,7 +10,49 @@ const state = {
   showHint: false,
   alarmInterval: null,
   alarmAudio: null,
+  selectedCategory: "all",
 };
+
+// ===================== 풀이 기록 관리 =====================
+function getSolvedSet() {
+  return new Set(JSON.parse(localStorage.getItem("solvedProblems") || "[]"));
+}
+
+function markSolved(problemId) {
+  const solved = getSolvedSet();
+  solved.add(String(problemId));
+  localStorage.setItem("solvedProblems", JSON.stringify([...solved]));
+}
+
+function isSolved(problemId) {
+  return getSolvedSet().has(String(problemId));
+}
+
+// ===================== 통합 문제 목록 =====================
+function getAllProblems() {
+  const algos = PROBLEMS.map(p => ({
+    ...p,
+    id: String(p.id),
+    category: "algorithm",
+    type: "algorithm",
+  }));
+  const challenges = CHALLENGES.map(p => ({
+    ...p,
+    type: "challenge",
+  }));
+  return [...algos, ...challenges];
+}
+
+function getFilteredProblems(category) {
+  const all = getAllProblems();
+  if (category === "all") return all;
+  return all.filter(p => p.category === category);
+}
+
+function getRandomProblem(category) {
+  const pool = category ? getFilteredProblems(category) : getAllProblems();
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 function saveAlarms() {
   localStorage.setItem("alarms", JSON.stringify(state.alarms));
@@ -27,9 +69,83 @@ function showScreen(name) {
   state.currentScreen = name;
 }
 
-// ===================== 랜덤 문제 선택 =====================
-function getRandomProblem() {
-  return PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
+// ===================== 문제 선택 화면 =====================
+function openProblemSelect() {
+  showScreen("select");
+  renderProblemSelect();
+}
+
+function selectCategory(cat, btn) {
+  state.selectedCategory = cat;
+  document.querySelectorAll(".cat-tab").forEach(t => t.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderProblemSelect();
+}
+
+function renderProblemSelect() {
+  const cat = state.selectedCategory;
+  const all = getAllProblems();
+  const solved = getSolvedSet();
+
+  // 카운트 업데이트
+  const counts = { all: all.length, algorithm: 0, practical: 0, toss: 0, async: 0 };
+  const solvedCounts = { all: 0, algorithm: 0, practical: 0, toss: 0, async: 0 };
+  all.forEach(p => {
+    counts[p.category] = (counts[p.category] || 0) + 1;
+    if (solved.has(String(p.id))) {
+      solvedCounts[p.category]++;
+      solvedCounts.all++;
+    }
+  });
+
+  Object.keys(counts).forEach(key => {
+    const el = document.getElementById(`count-${key}`);
+    if (el) el.textContent = `${solvedCounts[key]}/${counts[key]}`;
+  });
+
+  // 진행 바
+  const filtered = getFilteredProblems(cat);
+  const filteredSolved = filtered.filter(p => solved.has(String(p.id))).length;
+  const percent = filtered.length ? Math.round(filteredSolved / filtered.length * 100) : 0;
+  document.getElementById("progress-text").textContent = `${filteredSolved} / ${filtered.length} 풀이 완료`;
+  document.getElementById("progress-percent").textContent = `${percent}%`;
+  document.getElementById("progress-fill").style.width = `${percent}%`;
+
+  // 문제 리스트
+  const list = document.getElementById("problem-list");
+  const categoryLabels = {
+    algorithm: "알고리즘",
+    practical: "실무",
+    toss: "토스",
+    async: "비동기",
+  };
+
+  list.innerHTML = filtered.map(p => {
+    const done = solved.has(String(p.id));
+    return `
+    <div class="problem-card ${done ? 'solved' : ''}" onclick="startProblem('${p.id}')">
+      <div class="problem-card-left">
+        <span class="problem-status">${done ? '&#9989;' : '&#11035;'}</span>
+        <div>
+          <div class="problem-card-title">${escapeHtml(p.title)}</div>
+          <div class="problem-card-meta">
+            <span class="problem-cat-badge cat-${p.category}">${categoryLabels[p.category] || p.category}</span>
+            ${p.type === 'algorithm' ? '<span class="problem-cat-badge cat-algo">BOJ ' + p.id + '</span>' : ''}
+          </div>
+        </div>
+      </div>
+      <span class="problem-arrow">&#8250;</span>
+    </div>`;
+  }).join("");
+}
+
+function startProblem(problemId) {
+  const all = getAllProblems();
+  const problem = all.find(p => String(p.id) === String(problemId));
+  if (!problem) return;
+  state.activeProblem = problem;
+  state.activeAlarm = { label: "문제 풀기" };
+  openProblemScreen();
 }
 
 // ===================== 메인 화면: 알람 목록 =====================
@@ -257,29 +373,53 @@ function openProblemScreen() {
     document.getElementById("timer").textContent = formatTimer(state.elapsedSeconds);
   }, 1000);
 
-  // 백준 번호
-  document.getElementById("problem-id").textContent = `BOJ ${p.id}`;
+  // 문제 ID 뱃지
+  if (p.type === "algorithm") {
+    document.getElementById("problem-id").textContent = `BOJ ${p.id}`;
+  } else {
+    const catLabels = { practical: "실무", toss: "토스", async: "비동기" };
+    document.getElementById("problem-id").textContent = catLabels[p.category] || p.category;
+  }
 
   // 문제 내용
   document.getElementById("problem-title").textContent = p.title;
   document.getElementById("problem-desc").textContent = p.description;
 
   // 예제
-  const examplesHtml = p.testCases
-    .slice(0, 2)
-    .map(
-      (tc, i) => `
-    <div class="example-box">
-      <div class="example-label">입력 ${i + 1}</div>
-      <div class="example-code">${escapeHtml(tc.input)}</div>
-    </div>
-    <div class="example-box">
-      <div class="example-label">출력 ${i + 1}</div>
-      <div class="example-code">${escapeHtml(tc.output)}</div>
-    </div>`
-    )
-    .join("");
-  document.getElementById("examples").innerHTML = examplesHtml;
+  if (p.type === "algorithm") {
+    const examplesHtml = p.testCases
+      .slice(0, 2)
+      .map(
+        (tc, i) => `
+      <div class="example-box">
+        <div class="example-label">입력 ${i + 1}</div>
+        <div class="example-code">${escapeHtml(tc.input)}</div>
+      </div>
+      <div class="example-box">
+        <div class="example-label">출력 ${i + 1}</div>
+        <div class="example-code">${escapeHtml(tc.output)}</div>
+      </div>`
+      )
+      .join("");
+    document.getElementById("examples").innerHTML = examplesHtml;
+  } else {
+    // 챌린지 문제: 테스트 코드를 예제로 표시
+    const examplesHtml = p.testCases
+      .slice(0, 1)
+      .map(
+        (tc, i) => `
+      <div class="example-box">
+        <div class="example-label">테스트 예시</div>
+        <div class="example-code">${escapeHtml(tc.test)}</div>
+      </div>
+      <div class="example-box">
+        <div class="example-label">기대 출력</div>
+        <div class="example-code">${escapeHtml(tc.expected)}</div>
+      </div>`
+      )
+      .join("");
+    document.getElementById("examples").innerHTML = examplesHtml;
+  }
 
   // 힌트 초기화
   document.getElementById("hint-area").style.display = "none";
@@ -290,7 +430,6 @@ function openProblemScreen() {
   // 결과 초기화
   document.getElementById("results").innerHTML = "";
   document.getElementById("results").style.display = "none";
-
 }
 
 function formatTimer(s) {
@@ -383,10 +522,33 @@ function submitCode() {
   const resultsEl = document.getElementById("results");
   resultsEl.style.display = "block";
 
-  const results = p.testCases.map((tc, i) => {
-    return runCode(code, tc.input, tc.output, i + 1);
-  });
+  if (p.type === "challenge") {
+    submitChallengeCode(code, p, resultsEl);
+  } else {
+    submitAlgorithmCode(code, p, resultsEl);
+  }
+}
 
+function submitAlgorithmCode(code, p, resultsEl) {
+  const results = p.testCases.map((tc, i) => {
+    return runAlgorithmCode(code, tc.input, tc.output, i + 1);
+  });
+  renderResults(results, resultsEl, p);
+}
+
+async function submitChallengeCode(code, p, resultsEl) {
+  const results = [];
+  for (let i = 0; i < p.testCases.length; i++) {
+    const tc = p.testCases[i];
+    const result = tc.async
+      ? await runChallengeCodeAsync(code, tc.test, tc.expected, i + 1)
+      : runChallengeCodeSync(code, tc.test, tc.expected, i + 1);
+    results.push(result);
+  }
+  renderResults(results, resultsEl, p);
+}
+
+function renderResults(results, resultsEl, p) {
   resultsEl.innerHTML = results
     .map(
       (r) => `
@@ -409,12 +571,12 @@ function submitCode() {
   if (results.every((r) => r.passed)) {
     clearInterval(state.timerInterval);
     stopAlarmSound();
+    markSolved(p.id);
     setTimeout(() => showSolvedScreen(), 800);
   }
-
 }
 
-function runCode(code, input, expectedOutput, index) {
+function runAlgorithmCode(code, input, expectedOutput, index) {
   try {
     const wrapped = new Function(
       "input",
@@ -453,13 +615,92 @@ function runCode(code, input, expectedOutput, index) {
   }
 }
 
+function runChallengeCodeSync(code, testScript, expectedOutput, index) {
+  try {
+    const wrapped = new Function(
+      `
+      const __output = [];
+      const console = { log: function() {
+        __output.push(Array.from(arguments).map(a =>
+          typeof a === 'object' && a !== null ? JSON.stringify(a) : String(a)
+        ).join(' '));
+      }};
+      ${code}
+      ${testScript}
+      return __output.join('\\n');
+    `
+    );
+
+    const result = wrapped();
+    const actual = (result || "").trim();
+    const expected = expectedOutput.trim();
+
+    return {
+      index,
+      passed: actual === expected,
+      output: actual,
+      expected,
+      error: null,
+    };
+  } catch (e) {
+    return {
+      index,
+      passed: false,
+      output: "",
+      expected: expectedOutput.trim(),
+      error: e.message,
+    };
+  }
+}
+
+async function runChallengeCodeAsync(code, testScript, expectedOutput, index) {
+  try {
+    const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+    const wrapped = new AsyncFunction(
+      `
+      const __output = [];
+      const console = { log: function() {
+        __output.push(Array.from(arguments).map(a =>
+          typeof a === 'object' && a !== null ? JSON.stringify(a) : String(a)
+        ).join(' '));
+      }};
+      ${code}
+      ${testScript}
+      return __output.join('\\n');
+    `
+    );
+
+    const result = await wrapped();
+    const actual = (result || "").trim();
+    const expected = expectedOutput.trim();
+
+    return {
+      index,
+      passed: actual === expected,
+      output: actual,
+      expected,
+      error: null,
+    };
+  } catch (e) {
+    return {
+      index,
+      passed: false,
+      output: "",
+      expected: expectedOutput.trim(),
+      error: e.message,
+    };
+  }
+}
+
 // ===================== 정답 화면 =====================
 function showSolvedScreen() {
   document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
   const solved = document.querySelector(".solved-screen");
   solved.classList.add("active");
 
-  document.getElementById("solved-problem").textContent = `BOJ ${state.activeProblem.id} - ${state.activeProblem.title}`;
+  const p = state.activeProblem;
+  const label = p.type === "algorithm" ? `BOJ ${p.id} - ${p.title}` : p.title;
+  document.getElementById("solved-problem").textContent = label;
   document.getElementById("solved-time").textContent = formatTimer(state.elapsedSeconds);
 }
 

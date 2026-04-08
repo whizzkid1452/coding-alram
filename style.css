@@ -845,6 +845,158 @@ body {
   border-radius: 2px;
 }
 
+/* ===================== 문제 선택 화면 ===================== */
+#screen-select {
+  max-width: 700px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.cat-tab {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.1s;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.cat-tab:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+.cat-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.cat-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+/* 진행 바 */
+.progress-bar-container {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: var(--text2);
+}
+.progress-bar {
+  height: 4px;
+  background: var(--surface3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+/* 문제 카드 리스트 */
+.problem-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.problem-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  margin-bottom: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--surface3);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.problem-card:hover {
+  background: var(--surface2);
+  border-left-color: var(--accent);
+}
+.problem-card.solved {
+  border-left-color: var(--green);
+}
+.problem-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.problem-status {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.problem-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.problem-card-meta {
+  display: flex;
+  gap: 6px;
+  margin-top: 3px;
+}
+.problem-cat-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.cat-algorithm {
+  background: rgba(92, 132, 255, 0.12);
+  color: #5C84FF;
+}
+.cat-practical {
+  background: rgba(255, 179, 71, 0.12);
+  color: var(--orange);
+}
+.cat-toss {
+  background: rgba(92, 219, 92, 0.12);
+  color: var(--green);
+}
+.cat-async {
+  background: rgba(200, 120, 255, 0.12);
+  color: #C878FF;
+}
+.cat-algo {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text3);
+}
+.problem-arrow {
+  font-size: 18px;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+
 /* 삭제 버튼 */
 .btn-delete {
   width: 28px;
